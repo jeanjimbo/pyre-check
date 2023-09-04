@@ -97,13 +97,9 @@ class PackageInfo:
 
 
 def is_valid_package_name(name: str) -> bool:
-    if len(name) == 0:
+    if not name:
         return False
-    if name == "__pycache__":
-        return False
-    if "." in name:
-        return False
-    return True
+    return False if name == "__pycache__" else "." not in name
 
 
 def get_package_status(path: Path) -> PackageStatus:

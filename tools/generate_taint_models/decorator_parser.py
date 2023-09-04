@@ -74,13 +74,13 @@ class DecoratorParser:
         if isinstance(func, ast.Name):
             return func.id
         func = cast(ast.Attribute, func)
-        return self._resolve_decorator_func_name(func.value) + "." + func.attr
+        return f"{self._resolve_decorator_func_name(func.value)}.{func.attr}"
 
     def _parse_decorator(
         self, decorator: Union[ast.Name, ast.Call, ast.Attribute]
     ) -> Decorator:
         # decorator does not have args or kwargs
-        if isinstance(decorator, ast.Name) or isinstance(decorator, ast.Attribute):
+        if isinstance(decorator, (ast.Name, ast.Attribute)):
             return Decorator(self._resolve_decorator_func_name(decorator), set(), set())
         # decorator does have args and / or kwargs
         decorator_name = self._resolve_decorator_func_name(decorator.func)

@@ -240,8 +240,6 @@ def run_test_changed_pysa_file(
         test_model_path.unlink()
     except FileNotFoundError:
         LOG.warning(f"Could not clean up {test_model_path.absolute()} after test run.")
-        pass
-
     if returncode == 0:
         LOG.info("Run produced expected results\n")
     else:
@@ -298,8 +296,6 @@ def run_test_changed_taint_config_file(
         LOG.warning(
             f"Could not clean up {test_taint_config.absolute()} after test run."
         )
-        pass
-
     if returncode == 0:
         LOG.info("Run produced expected results\n")
     else:
@@ -323,8 +319,6 @@ def run_test_changed_models(
         test_model_path.unlink()
     except FileNotFoundError:
         LOG.warning(f"Could not remove up {test_model_path.absolute()}.")
-        pass
-
     # Expected should have an additional issue from removing the sanitizer
     new_issue = {
         "code": 5001,
@@ -405,8 +399,6 @@ def run_test_changed_source_files(
         new_file_path.unlink()
     except FileNotFoundError:
         LOG.warning(f"Could not clean up {new_file_path.absolute()} after test run.")
-        pass
-
     if returncode == 0:
         LOG.info("Run produced expected results\n")
     else:
@@ -470,8 +462,6 @@ def run_test_changed_decorators(
         new_model_path.unlink()
     except FileNotFoundError:
         LOG.warning(f"Could not clean up {new_model_path.absolute()} after test run.")
-        pass
-
     if returncode == 0:
         LOG.info("Run produced expected results\n")
     else:
@@ -497,8 +487,6 @@ def run_test_changed_overrides(
         test_model_path.unlink()
     except FileNotFoundError:
         LOG.warning(f"Could not remove up {test_model_path.absolute()}.")
-        pass
-
     # Expected should have an additional issue from not skipping overrides
     new_issue = {
         "code": 5001,

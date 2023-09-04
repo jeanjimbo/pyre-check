@@ -27,10 +27,7 @@ class Class:
         return self.my_property
 
     def uses_other(self, other: Optional[Class]):
-        if other:
-            return other.my_property
-        else:
-            return None
+        return other.my_property if other else None
 
 
 class Derived(Class):
@@ -194,19 +191,13 @@ class RegularAttribute:
 
 def test_union_property_attribute_source():
     obj: Union[TaintedGetterAndSetter, RegularAttribute]
-    if 1 > 2:
-        obj = TaintedGetterAndSetter()
-    else:
-        obj = RegularAttribute(_test_source())
+    obj = TaintedGetterAndSetter() if 1 > 2 else RegularAttribute(_test_source())
     return obj.my_property
 
 
 def test_union_property_attribute_sink(x):
     obj: Union[TaintedGetterAndSetter, RegularAttribute]
-    if 1 > 2:
-        obj = TaintedGetterAndSetter()
-    else:
-        obj = RegularAttribute(x)
+    obj = TaintedGetterAndSetter() if 1 > 2 else RegularAttribute(x)
     _test_sink(obj.my_property)
 
 

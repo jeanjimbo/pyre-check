@@ -97,7 +97,7 @@ def format_string_issue_with_multiple_triggered_user_controlled():
 def nested_stradd_and_fstring():
     x: str = user_controlled_input()
     y = "xyz"
-    return "abc" + f"{x + y}"
+    return f"abc{x + y}"
 
 
 def stradd_triggered_user_controlled(arg):
@@ -116,53 +116,4 @@ def test_large_string_add():
     G = 2
     K = 3
 
-    const_params = (
-        " --db="
-        + str(db_dir)
-        + " --wal_dir="
-        + str(wal_dir)
-        + " --num_levels="
-        + str(6)
-        + " --key_size="
-        + str(key_size)
-        + " --value_size="
-        + str(value_size)
-        + " --block_size="
-        + str(block_size)
-        + " --cache_size="
-        + str(cache_size)
-        + " --cache_numshardbits="
-        + str(6)
-        + " --compression_type="
-        + str("snappy")
-        + " --compression_ratio="
-        + str(0.5)
-        + " --write_buffer_size="
-        + str(int(128 * M))
-        + " --max_write_buffer_number="
-        + str(2)
-        + " --target_file_size_base="
-        + str(int(128 * M))
-        + " --max_bytes_for_level_base="
-        + str(int(1 * G))
-        + " --sync="
-        + str(0)
-        + " --verify_checksum="
-        + str(1)
-        + " --delete_obsolete_files_period_micros="
-        + str(int(60 * M))
-        + " --statistics="
-        + str(1)
-        + " --stats_per_interval="
-        + str(1)
-        + " --stats_interval="
-        + str(int(1 * M))
-        + " --histogram="
-        + str(1)
-        + " --memtablerep="
-        + str("skip_list")
-        + " --bloom_bits="
-        + str(10)
-        + " --open_files="
-        + str(int(20 * K))
-    )
+    const_params = f" --db={db_dir} --wal_dir={wal_dir} --num_levels=6 --key_size={key_size} --value_size={value_size} --block_size={block_size} --cache_size={cache_size} --cache_numshardbits=6 --compression_type=snappy --compression_ratio=0.5 --write_buffer_size={int(128 * M)} --max_write_buffer_number=2 --target_file_size_base={int(128 * M)} --max_bytes_for_level_base={int(1 * G)} --sync=0 --verify_checksum=1 --delete_obsolete_files_period_micros={int(60 * M)} --statistics=1 --stats_per_interval=1 --stats_interval={int(1 * M)} --histogram=1 --memtablerep=skip_list --bloom_bits=10 --open_files={int(20 * K)}"

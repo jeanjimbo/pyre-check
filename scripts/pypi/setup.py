@@ -113,44 +113,28 @@ def run(
         packages=find_packages(exclude=["tests", "pyre-check"]),
         data_files=[("bin", ["bin/pyre.bin"])]
         + get_all_files(root=Path.cwd() / "typeshed", extension_glob="*.pyi")
-        + get_all_files(root=Path.cwd() / "stubs/django", extension_glob="*.pyi")
+        + get_all_files(
+            root=Path.cwd() / "stubs/django", extension_glob="*.pyi"
+        )
         + get_all_files(root=Path.cwd() / "stubs/lxml", extension_glob="*.pyi")
-        + get_all_files(root=Path.cwd() / "pysa_filters", extension_glob="*.json")
+        + get_all_files(
+            root=Path.cwd() / "pysa_filters", extension_glob="*.json"
+        )
         + find_taint_stubs(),
         python_requires=">=3.7",
         install_requires=runtime_dependencies,
-        entry_points=dict(  # noqa we need to do this to make this .format-able
+        entry_points=dict(
             console_scripts=[
-                "pyre = " + module_name + ".client.pyre:main",
-                "pyre-upgrade = " + module_name + ".tools.upgrade.upgrade:main",
+                f"pyre = {module_name}.client.pyre:main",
+                f"pyre-upgrade = {module_name}.tools.upgrade.upgrade:main",
             ]
         ),
-        # pyre-fixme[6]: Expected `List[setuptools.extension.Extension]` for 20th
-        #  param but got `object`.
-        # pyre-fixme[6]: Expected `List[str]` for 20th param but got `object`.
-        # pyre-fixme[6]: Expected `Mapping[str, typing.Any]` for 20th param but got
-        #  `object`.
-        # pyre-fixme[6]: Expected `Mapping[str, List[str]]` for 20th param but got
-        #  `object`.
-        # pyre-fixme[6]: Expected `Mapping[str, typing.Mapping[str,
-        #  Tuple[typing.Any, typing.Any]]]` for 20th param but got `object`.
-        # pyre-fixme[6]: Expected `Mapping[str, typing.Type[setuptools.Command]]`
-        #  for 20th param but got `object`.
-        # pyre-fixme[6]: Expected `Mapping[str, str]` for 20th param but got `object`.
-        # pyre-fixme[6]: Expected `Type[setuptools.dist.Distribution]` for 20th
-        #  param but got `object`.
-        # pyre-fixme[6]: Expected `Union[List[str], str]` for 20th param but got
-        #  `object`.
-        # pyre-fixme[6]: Expected `bool` for 20th param but got `object`.
-        # pyre-fixme[6]: Expected `str` for 20th param but got `object`.
-        **kwargs
+        **kwargs,
     )
 
 
 def main() -> None:
-    with open("README.md") as f:
-        long_description = f.read()
-
+    long_description = Path("README.md").read_text()
     run(
         package_name="{PACKAGE_NAME}",
         package_version="{PACKAGE_VERSION}",

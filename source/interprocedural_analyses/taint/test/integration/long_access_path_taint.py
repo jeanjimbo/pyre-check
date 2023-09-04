@@ -24,9 +24,8 @@ class C:
         kind = str(params)
         if kind == "special_kind":
             request = "get_current_request()"
-        else:
-            if not request:
-                request = str(params)
+        elif not request:
+            request = str(params)
 
         return cls(id, params, kind, request)
 

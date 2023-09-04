@@ -22,11 +22,7 @@ def sink(x):
 
 
 def f_and_g_to_test():
-    if 1 > 2:
-        a = f()
-    else:
-        a = g()
-
+    a = f() if 1 > 2 else g()
     sink(a)
 
 

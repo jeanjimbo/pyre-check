@@ -32,8 +32,7 @@ def consolidate_nested(
     total_targets = []
     for nested_configuration in nested:
         configuration = Configuration(nested_configuration)
-        targets = configuration.targets
-        if targets:
+        if targets := configuration.targets:
             total_targets.extend(targets)
             repository.remove_paths([nested_configuration])
     configuration = Configuration(topmost)
@@ -76,11 +75,11 @@ class ConsolidateNestedConfigurations(ErrorSuppressingCommand):
     ) -> Dict[str, List[str]]:
         nested_configurations = {}
         for configuration in configurations:
-            if len(nested_configurations) == 0:
+            if not nested_configurations:
                 nested_configurations[configuration] = []
                 continue
             inserted = False
-            for topmost_configuration in nested_configurations.keys():
+            for topmost_configuration in nested_configurations:
                 existing = topmost_configuration.replace(
                     ".pyre_configuration.local", ""
                 )

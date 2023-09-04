@@ -137,13 +137,13 @@ class PyreCodeNavigationDaemonLaunchAndSubscribeHandler(
         server_input_channel: connections.AsyncTextReader,
         server_output_channel: connections.AsyncTextWriter,
     ) -> None:
-        subscription_name = "code_navigation"
         await server_output_channel.write('["Subscription", ["Subscribe"]]\n')
         first_response = await _read_server_response(server_input_channel)
         if json.loads(first_response) != ["Ok"]:
             raise ValueError(
                 f"Unexpected server response to Subscription: {first_response!r}"
             )
+        subscription_name = "code_navigation"
         await self._run_subscription_loop(
             subscription_name,
             server_input_channel,

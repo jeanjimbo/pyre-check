@@ -20,8 +20,7 @@ def some_source(name):
 
 
 def issue1():
-    x = some_source("my-data")
-    if x:
+    if x := some_source("my-data"):
         return
 
 

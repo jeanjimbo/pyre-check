@@ -14,9 +14,7 @@ def api_wrapper(func: Callable):
 
 
 def operate_on_twos(request, operator: str):
-    result = eval(f"2 {operator} 2")  # noqa: P204
-
-    return result
+    return eval(f"2 {operator} 2")
 
 
 @api_wrapper

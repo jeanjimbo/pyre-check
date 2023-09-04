@@ -65,9 +65,7 @@ def _get_subprocess_stdout(command: Sequence[str]) -> Optional[str]:
     result = subprocess.run(
         command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True
     )
-    if result.returncode != 0:
-        return None
-    return result.stdout
+    return None if result.returncode != 0 else result.stdout
 
 
 def _get_file_content(path: Path) -> Optional[str]:
@@ -148,9 +146,7 @@ def _server_log_sections(
 
 def _client_log_section(log_directory: Path) -> Optional[Section]:
     content = _get_file_content(log_directory / "pyre.stderr")
-    if content is None:
-        return None
-    return Section(name="Client Log", content=content)
+    return None if content is None else Section(name="Client Log", content=content)
 
 
 def _print_configuration_sections(

@@ -39,29 +39,31 @@ class RepositoryState(ABC):
     def from_json(input_json: Dict[str, Any]) -> "RepositoryState":
         try:
             kind = input_json["kind"]
-            if kind == "hg":
+            if kind == "file":
+                files = input_json["files"]
+                if isinstance(files, dict):
+                    return FileRepositoryState(files)
+                else:
+                    raise InvalidSpecificationException(
+                        "File repository must be specified as dicts"
+                    )
+            elif kind == "hg":
                 return HgRepositoryState(
                     repository=Path(input_json["repository"]),
                     commit_hash=input_json["commit_hash"],
                 )
-            elif kind == "file":
-                files = input_json["files"]
-                if not isinstance(files, dict):
-                    raise InvalidSpecificationException(
-                        "File repository must be specified as dicts"
-                    )
-                return FileRepositoryState(files)
             elif kind == "updated":
-                base = input_json["base"]
                 updates = input_json["updates"]
-                if not isinstance(updates, list):
+                if isinstance(updates, list):
+                    base = input_json["base"]
+                    return UpdatedRepositoryState(
+                        RepositoryState.from_json(base),
+                        [RepositoryUpdate.from_json(update) for update in updates],
+                    )
+                else:
                     raise InvalidSpecificationException(
                         "Updates must be specified as lists"
                     )
-                return UpdatedRepositoryState(
-                    RepositoryState.from_json(base),
-                    [RepositoryUpdate.from_json(update) for update in updates],
-                )
             else:
                 raise InvalidSpecificationException(
                     "Cannot create RepositoryState due to unrecognized kind"
@@ -298,7 +300,7 @@ class FileRepositoryUpdate(SingleUpdate):
         for handle, content in self.changes.items():
             # Need to create parent directory if it doesn't exist
             parent_path = Path(handle).parent
-            if not parent_path == Path("."):
+            if parent_path != Path("."):
                 environment.checked_run(
                     working_directory=working_directory,
                     command=f"mkdir -p {parent_path}",

@@ -185,4 +185,4 @@ def function_call_target_2(x: Union[B, C]):
 def multiple_callees_same_location():
     s = StrIsTainted()
     # The call to str() and the attribute access to str.__add__ have the same location in the AST.
-    return str(s) + "hello"
+    return f"{str(s)}hello"

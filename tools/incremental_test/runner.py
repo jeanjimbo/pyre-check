@@ -64,11 +64,9 @@ class PyreRunner:
         self._specification = specification
         self._working_directory = working_directory
         invocation = self._environment.pyre_client_override or "pyre"
-        binary_override = self._environment.pyre_binary_override
-        if binary_override:
+        if binary_override := self._environment.pyre_binary_override:
             invocation += f" --binary {binary_override}"
-        typeshed_override = self._environment.typeshed_override
-        if typeshed_override:
+        if typeshed_override := self._environment.typeshed_override:
             invocation += f" --typeshed {typeshed_override}"
         self._pyre_invocation: str = invocation
 
@@ -242,13 +240,11 @@ class ResultComparison:
             "profile_logs": self.profile_logs.to_json(),
         }
         discrepancy = self.discrepancy
-        if dont_show_discrepancy:
-            return result
-        else:
+        if not dont_show_discrepancy:
             result["discrepancy"] = (
                 "none" if discrepancy is None else discrepancy.to_json()
             )
-            return result
+        return result
 
 
 def compare_server_to_full(

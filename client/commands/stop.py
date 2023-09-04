@@ -24,15 +24,14 @@ LOG: logging.Logger = logging.getLogger(__name__)
 def stop_message(flavor: identifiers.PyreFlavor) -> str:
     if flavor == identifiers.PyreFlavor.CODE_NAVIGATION:
         return '["Command", ["Stop"]]'
-    else:
-        if flavor not in (
-            identifiers.PyreFlavor.CLASSIC,
-            identifiers.PyreFlavor.SHADOW,
-        ):
-            raise AssertionError(
-                f"Attempted to stop a server for unsupported flavor {flavor}"
-            )
-        return '["Stop"]'
+    if flavor not in (
+        identifiers.PyreFlavor.CLASSIC,
+        identifiers.PyreFlavor.SHADOW,
+    ):
+        raise AssertionError(
+            f"Attempted to stop a server for unsupported flavor {flavor}"
+        )
+    return '["Stop"]'
 
 
 def stop_server(socket_path: Path, flavor: identifiers.PyreFlavor) -> None:
@@ -53,7 +52,7 @@ def remove_socket_if_exists(socket_path: Path) -> None:
     except OSError as error:
         LOG.warning(f"Failed to remove socket file at `{socket_path}`: {error}")
     try:
-        socket_path.with_suffix(socket_path.suffix + ".lock").unlink()
+        socket_path.with_suffix(f"{socket_path.suffix}.lock").unlink()
     except FileNotFoundError:
         pass
     except OSError as error:

@@ -14,7 +14,7 @@ _T2 = TypeVar("_T2")
 
 
 class ParameterSpecificationComponentMeta(type):
-    def __getitem__(cls, __tparams) -> object:
+    def __getitem__(self, __tparams) -> object:
         return Any
 
 

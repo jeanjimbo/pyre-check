@@ -88,16 +88,16 @@ def index(path: str = ".") -> None:
     if not taint_output_directory.is_dir():
         raise AssertionError(f"No such directory `{path}`")
 
-    taint_output_files: List[Path] = []
-    for filepath in taint_output_directory.iterdir():
+    taint_output_files: List[Path] = [
+        filepath
+        for filepath in taint_output_directory.iterdir()
         if (
             filepath.is_file()
             and filepath.name.startswith("taint-output")
             and filepath.suffix == ".json"
-        ):
-            taint_output_files.append(filepath)
-
-    if len(taint_output_files) == 0:
+        )
+    ]
+    if not taint_output_files:
         raise AssertionError(f"Could not find taint output files in `{path}`")
 
     with multiprocessing.Pool() as pool:
@@ -156,17 +156,16 @@ def _filter_taint_tree(
         caller_port = taint["port"]
         new_local_taints = []
         for local_taint in taint["taint"]:
-            new_kinds = [
+            if new_kinds := [
                 frame
                 for frame in local_taint["kinds"]
                 if frame_predicate(caller_port, frame)
-            ]
-            if len(new_kinds) > 0:
+            ]:
                 new_local_taint = local_taint.copy()
                 new_local_taint["kinds"] = new_kinds
                 new_local_taints.append(new_local_taint)
 
-        if len(new_local_taints) > 0:
+        if new_local_taints:
             new_taint = taint.copy()
             new_taint["taint"] = new_local_taints
             new_taint_tree.append(new_taint)

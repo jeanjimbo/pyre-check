@@ -217,7 +217,7 @@ class TargetsToConfiguration(ErrorSuppressingCommand):
         all_errors = None
         if glob_threshold is not None:
             original_targets = configuration.targets
-            configuration.targets = ["//" + str(directory) + "/..."]
+            configuration.targets = [f"//{str(directory)}/..."]
             configuration.write()
 
             all_errors = configuration.get_errors()
@@ -301,7 +301,7 @@ class TargetsToConfiguration(ErrorSuppressingCommand):
             (directory.split("/") for directory in configuration_directories),
             key=lambda directory: (len(directory), directory),
         )
-        if len(configuration_directories) == 0:
+        if not configuration_directories:
             configuration_directories = [str(subdirectory)]
         else:
             # Fill in missing coverage
@@ -311,14 +311,16 @@ class TargetsToConfiguration(ErrorSuppressingCommand):
                 if len(directory) <= current_depth:
                     continue
                 all_subdirectories = find_directories(
-                    Path("/".join(directory[0:current_depth]))
+                    Path("/".join(directory[:current_depth]))
                 )
-                for subdirectory in all_subdirectories:
+                missing_directories.extend(
+                    subdirectory
+                    for subdirectory in all_subdirectories
                     if all(
                         not configuration_directory.startswith(str(subdirectory))
                         for configuration_directory in configuration_directories
-                    ):
-                        missing_directories.append(subdirectory)
+                    )
+                )
                 current_depth += 1
             configuration_directories.extend(missing_directories)
         return [Path(directory) for directory in configuration_directories]
@@ -358,8 +360,7 @@ class TargetsToConfiguration(ErrorSuppressingCommand):
                 converted.append(directory)
 
         summary = self._repository.MIGRATION_SUMMARY
-        glob = self._glob_threshold
-        if glob:
+        if glob := self._glob_threshold:
             summary += (
                 f"\n\nConfiguration target automatically expanded to include "
                 f"all subtargets, expanding type coverage while introducing "

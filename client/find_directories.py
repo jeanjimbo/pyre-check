@@ -130,12 +130,11 @@ def get_relative_local_root(
 ) -> Optional[str]:
     if local_root is None:
         return None
-    else:
-        try:
-            return str(local_root.relative_to(global_root))
-        except ValueError:
-            # This happens when `local_root` is not prefixed by `global_root`
-            return None
+    try:
+        return str(local_root.relative_to(global_root))
+    except ValueError:
+        # This happens when `local_root` is not prefixed by `global_root`
+        return None
 
 
 class FoundRoot(NamedTuple):
@@ -288,22 +287,20 @@ def find_typeshed_search_paths(
     typeshed_root: Path,
     layout: Optional[TypeshedLayout] = None,
 ) -> List[Path]:
-    search_path = []
     third_party_roots = TypeshedLayout.find_third_party_roots(
         typeshed_root=typeshed_root,
         layout=layout,
     )
-    for typeshed_subdirectory in itertools.chain(
-        [typeshed_root / "stdlib"], third_party_roots
-    ):
-        if typeshed_subdirectory.is_dir():
-            search_path.append(typeshed_subdirectory)
-    return search_path
+    return [
+        typeshed_subdirectory
+        for typeshed_subdirectory in itertools.chain(
+            [typeshed_root / "stdlib"], third_party_roots
+        )
+        if typeshed_subdirectory.is_dir()
+    ]
 
 
 def find_taint_models_directory() -> Optional[Path]:
     install_root = Path(sys.prefix)
     bundled_taint_models = install_root / "lib/pyre_check/taint/"
-    if bundled_taint_models.is_dir():
-        return bundled_taint_models
-    return None
+    return bundled_taint_models if bundled_taint_models.is_dir() else None

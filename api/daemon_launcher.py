@@ -150,12 +150,12 @@ async def _start_server(
     )
     if not isinstance(server_start_status, initialization.StartSuccess):
         return StartFailure(server_start_status.message)
-    else:
-        registration = await server_starter.register_client(socket_path)
-        if isinstance(registration, RegitrationSuccess):
-            return StartedServerInfo(socket_path, registration.client_id)
-        else:
-            return StartFailure(registration.message)
+    registration = await server_starter.register_client(socket_path)
+    return (
+        StartedServerInfo(socket_path, registration.client_id)
+        if isinstance(registration, RegitrationSuccess)
+        else StartFailure(registration.message)
+    )
 
 
 async def start_server(

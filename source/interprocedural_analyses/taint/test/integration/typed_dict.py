@@ -13,8 +13,7 @@ class SimpleTypedDict(TypedDict):
 
 
 def test_typed_dict_setitem():
-    d: SimpleTypedDict = {"foo": 0, "bar": ""}
-    d["bar"] = _test_source()
+    d: SimpleTypedDict = {"foo": 0, "bar": _test_source()}
     _test_sink(d["bar"])  # This is an issue.
     _test_sink(d["foo"])  # This is NOT an issue.
 

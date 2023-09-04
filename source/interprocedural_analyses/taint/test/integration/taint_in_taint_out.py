@@ -32,11 +32,7 @@ def get_data(x):
 def product_data(x):
     data = get_data(x)
 
-    if x:
-        parent = product_data(x.parent)
-    else:
-        parent = None
-
+    parent = product_data(x.parent) if x else None
     is_blocked = some_service(data.id)
     report_tuple = DataRecord(id=data.id, username=data.name, isBlocked=is_blocked)
     return {
@@ -168,10 +164,7 @@ def add_feature(arg):
 
 
 def tito_with_feature(arg):
-    if arg:
-        return arg
-    else:
-        return add_feature(arg)
+    return arg if arg else add_feature(arg)
 
 
 def test_always_via_feature():
@@ -197,7 +190,7 @@ def test_explicit_call_to_superclass():
 
 
 def evaluate_lazy(payload: Dict[str, str]):
-    return {key: value for key, value in payload.items()}
+    return dict(payload)
 
 
 def test_simplified_evaluator():
@@ -206,10 +199,7 @@ def test_simplified_evaluator():
 
 class ComplexEvaluator:
     def evaluate_lazy_field(self, field):
-        if callable(field):
-            return field()
-        else:
-            return field
+        return field() if callable(field) else field
 
     def evaluate_lazy_payload(self, payload):
         def _evaluate(field):
@@ -357,40 +347,35 @@ def combine_collapse_one(arg):
     x = {"a": arg}
     y = tito_collapse_one(x)
     z = {"a": y}
-    t = tito_collapse_one(z)
-    return t
+    return tito_collapse_one(z)
 
 
 def combine_collapse_two(arg):
     x = {"a": arg}
     y = tito_collapse_two(x)
     z = {"a": y}
-    t = tito_collapse_two(z)
-    return t
+    return tito_collapse_two(z)
 
 
 def combine_collapse_three(arg):
     x = {"a": arg}
     y = tito_collapse_three(x)
     z = {"a": y}
-    t = tito_collapse_three(z)
-    return t
+    return tito_collapse_three(z)
 
 
 def combine_collapse_two_and_one(arg):
     x = {"a": arg}
     y = tito_collapse_two(x)
     z = {"a": y}
-    t = tito_collapse_one(z)
-    return t
+    return tito_collapse_one(z)
 
 
 def combine_collapse_one_and_two(arg):
     x = {"a": arg}
     y = tito_collapse_one(x)
     z = {"a": y}
-    t = tito_collapse_two(z)
-    return t
+    return tito_collapse_two(z)
 
 
 def loop_perfect_tito(x):
@@ -447,10 +432,7 @@ def no_issue_tito_collapse_two_with_input_path():
 
 
 def join_tito_collapse_test_3(x):
-    if 1 > 2:
-        return tito_collapse_one(x)
-    else:
-        return {"foo": tito_collapse_two(x)}
+    return tito_collapse_one(x) if 1 > 2 else {"foo": tito_collapse_two(x)}
 
 
 def issue_join_tito_collapse_test_3():
@@ -489,9 +471,7 @@ def issue_user_declared_tito_collapse_one():
 
 
 def no_tito_init_then_overwrite(x):
-    d = {"a": x}
-    d["a"] = 0
-    return d  # TODO(T146774878): Wrongly infers tito
+    return {"a": 0}
 
 
 def no_tito_overwrite_then_init(d):
@@ -501,5 +481,5 @@ def no_tito_overwrite_then_init(d):
 
 def tito_with_sink(d):
     x = d["a"]
-    _test_sink(d["a"])
+    _test_sink(x)
     return x

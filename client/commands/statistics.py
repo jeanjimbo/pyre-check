@@ -78,8 +78,7 @@ class SuppressionCountCollector(coverage_data.VisitorWithPositionData):
             return []
         code_strings = code_group.strip("[] ").split(",")
         try:
-            codes = [int(code) for code in code_strings]
-            return codes
+            return [int(code) for code in code_strings]
         except ValueError:
             LOG.warning("Invalid error suppression code: %s", line)
             return []
@@ -286,7 +285,7 @@ def aggregate_statistics(
 
     for statistics_data in data.values():
         annotation_counts = statistics_data.annotations.to_count_dict()
-        for key in aggregate_annotations.keys():
+        for key in aggregate_annotations:
             aggregate_annotations[key] += annotation_counts[key]
 
     return AggregatedStatisticsData(

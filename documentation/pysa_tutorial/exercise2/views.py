@@ -11,9 +11,7 @@ from django.http import HttpRequest, HttpResponse
 def operate_on_twos(request: HttpRequest) -> HttpResponse:
     operator = request.POST["operator"]
 
-    result = eval(f"2 {operator} 2")  # noqa: P204
-
-    return result
+    return eval(f"2 {operator} 2")
 
 
 def operate_on_threes(request: HttpRequest) -> HttpResponse:
@@ -27,6 +25,4 @@ def operate_on_threes(request: HttpRequest) -> HttpResponse:
 def operate_on_fours(request: HttpRequest) -> HttpResponse:
     operator = request.GET["operator"]
 
-    result = subprocess.getoutput(f"expr 4 {operator} 4")
-
-    return result
+    return subprocess.getoutput(f"expr 4 {operator} 4")

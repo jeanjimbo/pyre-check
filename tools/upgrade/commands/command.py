@@ -158,11 +158,10 @@ class ErrorSuppressingCommand(Command):
         if not configuration.is_local:
             return
         if upgrade_version:
-            if configuration.version:
-                configuration.remove_version()
-                configuration.write()
-            else:
+            if not configuration.version:
                 return
+            configuration.remove_version()
+            configuration.write()
         errors = (
             Errors.from_stdin(only_fix_error_code)
             if error_source == ErrorSource.STDIN and not upgrade_version

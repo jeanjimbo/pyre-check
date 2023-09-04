@@ -223,11 +223,14 @@ def _stop_server(socket_path: Path, flavor: identifiers.PyreFlavor) -> None:
 def _find_server_flavor(socket_path: Path) -> identifiers.PyreFlavor:
     # Socket paths are of the form `/tmp/pyre_{md5}[__{flavor}].sock`.
     serialized_path = str(socket_path)
-    for flavor in identifiers.PyreFlavor:
-        if flavor.value in serialized_path:
-            return flavor
-    # No suffix indicates a classic server.
-    return identifiers.PyreFlavor.CLASSIC
+    return next(
+        (
+            flavor
+            for flavor in identifiers.PyreFlavor
+            if flavor.value in serialized_path
+        ),
+        identifiers.PyreFlavor.CLASSIC,
+    )
 
 
 def find_all_servers(socket_paths: Iterable[Path]) -> AllServerStatus:

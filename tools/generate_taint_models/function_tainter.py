@@ -64,14 +64,12 @@ def taint_pyre_functions(
     annotations: AnnotationSpecification,
     whitelist: Optional[WhitelistSpecification],
 ) -> List[PyreFunctionDefinitionModel]:
-    tainted_functions = []
-    for definition in functions_to_taint:
-        tainted_functions.append(
-            PyreFunctionDefinitionModel(
-                definition, annotations=annotations, whitelist=whitelist
-            )
+    return [
+        PyreFunctionDefinitionModel(
+            definition, annotations=annotations, whitelist=whitelist
         )
-    return tainted_functions
+        for definition in functions_to_taint
+    ]
 
 
 def taint_callable_dataclass_fields_parameters(
@@ -98,12 +96,12 @@ def taint_callable_dataclass_fields_parameters(
     for parameter_name, parameter_type in parameters_annotations.items():
         if parameter_type is not None and dataclasses.is_dataclass(parameter_type):
             attributes = [field.name for field in dataclasses.fields(parameter_type)]
-            for attribute in attributes:
-                attribute_parameters_annotations.append(
-                    {
-                        parameter_name: f"{parameter_taint}[{parameter_kind}, ParameterPath[_.{attribute}]]"
-                    }
-                )
+            attribute_parameters_annotations.extend(
+                {
+                    parameter_name: f"{parameter_taint}[{parameter_kind}, ParameterPath[_.{attribute}]]"
+                }
+                for attribute in attributes
+            )
         else:
             simple_parameters_annotation[
                 parameter_name

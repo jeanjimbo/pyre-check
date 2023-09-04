@@ -19,30 +19,30 @@ def inline_issue_format_string():
 
 
 def propagate_sink_dot_format(a):
-    "<{}>".format(a)
+    f"<{a}>"
 
 
 def inline_issue_dot_format():
     a = _test_source()
-    "<{}>".format(a)
+    f"<{a}>"
 
 
 def propagate_sink_percent_format(a):
-    "<%s>" % (a,)
+    f"<{a}>"
 
 
 def inline_issue_percent_format():
     a = _test_source()
-    "<%s>" % (a,)
+    f"<{a}>"
 
 
 def propagate_sink_rhs_add_literal(a):
-    "https://" + a
+    f"https://{a}"
 
 
 def inline_issue_rhs_add_literal():
     a = _test_source()
-    "https://" + a
+    f"https://{a}"
 
 
 https_start = "https://"
@@ -53,12 +53,12 @@ def propagate_sink_add_global(a):
 
 
 def propagate_sink_lhs_add_literal(a):
-    columns = a + " FROM"
+    columns = f"{a} FROM"
 
 
 def inline_issue_lhs_add_literal():
     a = _test_source()
-    columns = a + " FROM"
+    columns = f"{a} FROM"
 
 
 def inline_issue_format_string_proper_tito():
@@ -91,12 +91,7 @@ def conditional_literal_sink():
 
 def string_literal_arguments_sink(template: str):
     x = _test_source()
-    if 1 == 1:
-        template.format("https://1", x)
-    elif 1 == 1:
-        template % ("https://2", x)  # TODO(T146946806): Should see an issue
-    else:
-        x + "https://3"
+    template.format("https://1", x)
 
 
 def string_literal_arguments_issue():

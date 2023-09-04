@@ -50,16 +50,13 @@ class Woot:
 
 
 def push_pop_no_taint():
-    x = []
-    x.append(_test_source())
+    x = [_test_source()]
     x.pop()
     return x
 
 
 def push_pop_taint():
-    x = []
-    x.append(_test_source())
-    x.append(1)
+    x = [_test_source(), 1]
     x.pop()
     return x
 

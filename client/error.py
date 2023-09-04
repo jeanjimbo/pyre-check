@@ -124,7 +124,7 @@ class Error:
 
     def to_sarif(self) -> Dict[str, Any]:
         return {
-            "ruleId": "PYRE-ERROR-" + str(self.code),
+            "ruleId": f"PYRE-ERROR-{str(self.code)}",
             "level": "error",
             "message": {"text": self.description},
             "locations": [
@@ -146,7 +146,7 @@ class Error:
 
     def get_sarif_rule(self) -> Dict[str, Any]:
         return {
-            "id": "PYRE-ERROR-" + str(self.code),
+            "id": f"PYRE-ERROR-{str(self.code)}",
             "name": self.name.title().replace(" ", ""),
             "shortDescription": {"text": self.name},
             "helpUri": "https://www.pyre-check.org",
@@ -198,7 +198,7 @@ class TaintConfigurationError:
 
     def to_sarif(self) -> Dict[str, Any]:
         return {
-            "ruleId": "PYRE-TAINT-CONFIGURATION-ERROR-" + str(self.code)
+            "ruleId": f"PYRE-TAINT-CONFIGURATION-ERROR-{str(self.code)}"
             if self.code is not None
             else "PYRE-TAINT-CONFIGURATION-ERROR-MDL",
             "level": "error",
@@ -207,7 +207,9 @@ class TaintConfigurationError:
                 {
                     "physicalLocation": {
                         "artifactLocation": {
-                            "uri": str(self.path) if self.path is not None else None,
+                            "uri": str(self.path)
+                            if self.path is not None
+                            else None,
                         },
                         "region": {
                             "startLine": 0,
@@ -222,7 +224,7 @@ class TaintConfigurationError:
 
     def get_sarif_rule(self) -> Dict[str, Any]:
         return {
-            "id": "PYRE-TAINT-CONFIGURATION-ERROR-" + str(self.code)
+            "id": f"PYRE-TAINT-CONFIGURATION-ERROR-{str(self.code)}"
             if self.code is not None
             else "PYRE-TAINT-CONFIGURATION-ERROR-MDL",
             "name": "TaintConfigurationError",
@@ -290,7 +292,7 @@ class ModelVerificationError:
 
     def to_sarif(self) -> Dict[str, Any]:
         return {
-            "ruleId": "PYRE-MODEL-VERIFICATION-ERROR-" + str(self.code)
+            "ruleId": f"PYRE-MODEL-VERIFICATION-ERROR-{str(self.code)}"
             if self.code is not None
             else "PYRE-MODEL-VERIFICATION-ERROR-MDL",
             "level": "error",
@@ -299,7 +301,9 @@ class ModelVerificationError:
                 {
                     "physicalLocation": {
                         "artifactLocation": {
-                            "uri": str(self.path) if self.path is not None else None,
+                            "uri": str(self.path)
+                            if self.path is not None
+                            else None,
                         },
                         "region": {
                             "startLine": self.line,
@@ -314,7 +318,7 @@ class ModelVerificationError:
 
     def get_sarif_rule(self) -> Dict[str, Any]:
         return {
-            "id": "PYRE-MODEL-VERIFICATION-ERROR-" + str(self.code)
+            "id": f"PYRE-MODEL-VERIFICATION-ERROR-{str(self.code)}"
             if self.code is not None
             else "PYRE-MODEL-VERIFICATION-ERROR-MDL",
             "name": "ModelVerificationError",

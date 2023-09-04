@@ -45,7 +45,7 @@ class PlatformAware(Generic[T]):
                 return None
 
             invalid_keys = value.keys() - PLATFORM_MAPPING.values()
-            if not len(invalid_keys) == 0:
+            if len(invalid_keys) != 0:
                 raise InvalidConfiguration(
                     f"Configuration `{field_name}` only supports platforms: "
                     f"{PLATFORM_MAPPING.values()} but got: `{invalid_keys}`."

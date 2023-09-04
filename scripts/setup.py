@@ -237,7 +237,9 @@ class Setup(NamedTuple):
 
         environment_variables = self.opam_environment_variables()
         if rust_path is not None:
-            environment_variables["PATH"] = str(rust_path) + ":" + environment_variables["PATH"]
+            environment_variables["PATH"] = (
+                f"{str(rust_path)}:" + environment_variables["PATH"]
+            )
 
         opam_install_command = ["opam", "install", "--yes"]
 
@@ -318,10 +320,7 @@ class Setup(NamedTuple):
             stderr: {called_process_error.stderr}')
             raise called_process_error
 
-        if output.endswith("\n"):
-            return output[:-1]
-        else:
-            return output
+        return output[:-1] if output.endswith("\n") else output
 
 
 def _make_opam_root(local: bool, temporary_root: bool, default: Optional[Path]) -> Path:
@@ -333,9 +332,7 @@ def _make_opam_root(local: bool, temporary_root: bool, default: Optional[Path]) 
             local_opam.parent.mkdir(parents=True, exist_ok=True)
             local_opam.symlink_to(home_opam, target_is_directory=True)
         return home_opam
-    if temporary_root:
-        return Path(mkdtemp())
-    return default or home_opam
+    return Path(mkdtemp()) if temporary_root else default or home_opam
 
 
 def setup(runner_type: Type[Setup]) -> None:

@@ -27,16 +27,16 @@ class SharedMemory:
         heap_size = self.heap_size
         dependency_table_power = self.dependency_table_power
         hash_table_power = self.hash_table_power
-        return {
-            **({"heap_size": heap_size} if heap_size is not None else {}),
-            **(
+        return (
+            ({"heap_size": heap_size} if heap_size is not None else {})
+            | (
                 {"dependency_table_power": dependency_table_power}
                 if dependency_table_power is not None
                 else {}
-            ),
-            **(
+            )
+            | (
                 {"hash_table_power": hash_table_power}
                 if hash_table_power is not None
                 else {}
-            ),
-        }
+            )
+        )

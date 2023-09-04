@@ -106,7 +106,7 @@ def _is_precise_unpacked(type_name: str) -> bool:
     There's not enough information here to tell whether the name
      is _really_ a TypeVarTuple, but anything that's not should be
     a type error, and thus not given to us by Pyre."""
-    if len(type_name) == 0 or type_name[0] != "*":
+    if not type_name or type_name[0] != "*":
         return False
 
     parametric = _parametric_type(type_name[1:])
@@ -130,7 +130,7 @@ def _is_precise_tuple(type_name: str) -> bool:
     parametric = _parametric_type(type_name)
 
     return parametric is not None and (
-        (parametric.name == "Tuple" or parametric.name == "typing.Tuple")
+        parametric.name in ["Tuple", "typing.Tuple"]
         and all(
             _is_precise_tensor_dimension(dimension)
             for dimension in parametric.parameters
@@ -138,7 +138,10 @@ def _is_precise_tuple(type_name: str) -> bool:
         or (
             parametric.name == "Broadcast"
             and len(parametric.parameters) == 2
-            and all(_is_precise_tuple(parameter) for parameter in parametric.parameters)
+            and all(
+                _is_precise_tuple(parameter)
+                for parameter in parametric.parameters
+            )
         )
     )
 

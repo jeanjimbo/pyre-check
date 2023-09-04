@@ -76,18 +76,14 @@ if __name__ == "__main__":
         output = subprocess.check_output(command).decode()
 
         if arguments.save_results_to is not None:
-            with open(f"{arguments.save_results_to}/errors.json") as file:
-                output = file.read()
-
+            output = Path(f"{arguments.save_results_to}/errors.json").read_text()
     except subprocess.CalledProcessError as exception:
         LOG.error(f"`pyre analyze` failed with return code {exception.returncode}")
         sys.stdout.write(exception.output.decode())
         sys.exit(exception.returncode)
 
     expected = ""
-    with open("result.json") as file:
-        expected = file.read()
-
+    expected = Path("result.json").read_text()
     if normalized_json_dump(expected) != normalized_json_dump(output):
         with open("result.actual", "w") as file:
             file.write(normalized_json_dump(output))

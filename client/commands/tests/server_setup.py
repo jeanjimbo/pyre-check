@@ -315,7 +315,7 @@ def extract_json_from_json_rpc_message(
             f"Did not get expected content length header, but {content_length_portion!r}"
         )
     content_length = int(content_length_portion[len(CONTENT_LENGTH_PREFIX) :])
-    if not len(json_portion) == content_length:
+    if len(json_portion) != content_length:
         raise ValueError(
             f"Expected content length {content_length} to match length "
             f"{len(json_portion)} of json mssage {json_portion!r}"

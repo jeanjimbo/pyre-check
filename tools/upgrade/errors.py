@@ -367,15 +367,15 @@ def _split_across_lines(
         ):
             # This new token would make the line exceed the limit,
             # hence terminate what we have accumulated.
-            result.append(("{}{}".format(prefix, buffered_line)).rstrip())
+            result.append(f"{prefix}{buffered_line}".rstrip())
             # The first line already has a comment token on it, so don't prefix #. For
             # the rest, we need to add the comment symbol manually.
-            prefix = "{}#  ".format(" " * indent)
+            prefix = f'{" " * indent}#  '
             buffered_line = ""
 
         buffered_line = buffered_line + token + " "
 
-    result.append(("{}{}".format(prefix, buffered_line)).rstrip())
+    result.append(f"{prefix}{buffered_line}".rstrip())
     return result
 
 
@@ -398,10 +398,10 @@ def _get_unused_ignore_codes(errors: List[Dict[str, str]]) -> List[int]:
     unused_ignore_codes: List[int] = []
     ignore_errors = [error for error in errors if error["code"] == "0"]
     for error in ignore_errors:
-        match = re.search(
-            r"The `pyre-ignore\[(.*?)\]` or `pyre-fixme\[.*?\]`", error["description"]
-        )
-        if match:
+        if match := re.search(
+            r"The `pyre-ignore\[(.*?)\]` or `pyre-fixme\[.*?\]`",
+            error["description"],
+        ):
             unused_ignore_codes.extend(
                 int_code
                 for int_code in (
@@ -582,17 +582,17 @@ def _lines_after_suppressing_errors(
         else:
             is_end_of_multi_line_string = False
 
-        if is_end_of_multi_line_string and len(comments) > 0:
+        if is_end_of_multi_line_string and comments:
             # Use a simple same-line suppression for errors on a multi-line string close
             error_codes = [
                 error["code"] for error in relevant_errors if error["code"] != "0"
             ]
-            line = line + "  # pyre-fixme[{}]".format(", ".join(error_codes))
+            line = f'{line}  # pyre-fixme[{", ".join(error_codes)}]'
             new_lines.append(line)
             continue
 
         # Add suppression comments.
-        if not line_break_block.is_active and len(comments) > 0:
+        if not line_break_block.is_active and comments:
             LOG.info(
                 "Adding comment%s on line %d: %s",
                 "s" if len(comments) > 1 else "",
@@ -679,9 +679,7 @@ def _suppress_errors(
         error["code"] == "404" for error_list in errors.values() for error in error_list
     ):
         new_lines = _find_first_non_comment_line_for_unparseable_file(lines)
-        output = "\n".join(new_lines)
-        return output
-
+        return "\n".join(new_lines)
     errors = _relocate_errors_inside_format_strings(errors, input)
 
     new_lines = _lines_after_suppressing_errors(
@@ -705,12 +703,12 @@ def _error_to_fixme_comment_lines(
         return []
 
     description = custom_comment if custom_comment else error["description"]
-    comment = "{}# pyre-fixme[{}]: {}".format(" " * indent, error["code"], description)
+    comment = f'{" " * indent}# pyre-fixme[{error["code"]}]: {description}'
 
     if not max_line_length:
         return [comment]
 
-    truncated_comment = comment[: (max_line_length - 3)] + "..."
+    truncated_comment = f"{comment[:max_line_length - 3]}..."
     split_comment_lines = _split_across_lines(comment, indent, max_line_length)
     should_truncate = (
         truncate
@@ -729,8 +727,7 @@ def _build_error_map(
             description = error["concise_description"]
         else:
             description = error["description"]
-        match = re.search(r"\[(\d+)\]: (.*)", description)
-        if match:
+        if match := re.search(r"\[(\d+)\]: (.*)", description):
             error_map[error["line"]].append(
                 {"code": match.group(1), "description": match.group(2)}
             )

@@ -67,8 +67,7 @@ def test_apply_tito(x):
 
 def source_through_tito():
     x = _test_source()
-    y = apply(has_tito, x)
-    return y
+    return apply(has_tito, x)
 
 
 def test_apply_source():
@@ -99,10 +98,7 @@ def test_location(x: int, y: Callable, z: int):
 
 
 def conditional_apply(f, g, cond: bool, x: int):
-    if cond:
-        return f(x)
-    else:
-        return g(x)
+    return f(x) if cond else g(x)
 
 
 def safe():

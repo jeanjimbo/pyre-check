@@ -321,19 +321,14 @@ class AnnotationFixer(libcst.CSTTransformer):
             if match is not None:
                 annotation = f"{match.group(2)}{match.group(3)}"
 
-        try:
+        with contextlib.suppress(libcst._exceptions.ParserSyntaxError):
             tree = libcst.parse_module(annotation)
             annotation = tree.visit(
                 AnnotationFixer(
                     qualifier=qualifier,
                 )
             ).code
-        except libcst._exceptions.ParserSyntaxError:
-            pass
-
-        if not runtime_defined:
-            return f'"{annotation}"'
-        return annotation
+        return f'"{annotation}"' if not runtime_defined else annotation
 
 
 @dataclasses.dataclass(frozen=True)
@@ -386,19 +381,18 @@ class TypeAnnotation:
     def to_stub(self, prefix: str = "") -> str:
         if self.annotation is None:
             return ""
-        else:
-            sanitized = AnnotationFixer.sanitize(
-                annotation=self.annotation,
-                qualifier=self.qualifier,
-                quote_annotations=self.options.quote_annotations,
-                dequalify_all=self.options.dequalify,
-                runtime_defined=self.runtime_defined,
-            )
-            if self.options.simple_annotations and not TypeAnnotation.is_simple(
-                sanitized
-            ):
-                return ""
-            return prefix + sanitized
+        sanitized = AnnotationFixer.sanitize(
+            annotation=self.annotation,
+            qualifier=self.qualifier,
+            quote_annotations=self.options.quote_annotations,
+            dequalify_all=self.options.dequalify,
+            runtime_defined=self.runtime_defined,
+        )
+        if self.options.simple_annotations and not TypeAnnotation.is_simple(
+            sanitized
+        ):
+            return ""
+        return prefix + sanitized
 
     @property
     def missing(self) -> bool:
@@ -768,11 +762,11 @@ def create_infer_arguments_and_cleanup(
 def _check_working_directory(
     working_directory: Path, global_root: Path, relative_local_root: Optional[str]
 ) -> None:
-    candidate_locations: List[str] = []
     if working_directory == global_root:
         return
-    candidate_locations.append(f"`{global_root}` with `--local-configuration` set")
-
+    candidate_locations: List[str] = [
+        f"`{global_root}` with `--local-configuration` set"
+    ]
     if relative_local_root is not None:
         local_root = global_root / relative_local_root
         if working_directory == local_root:

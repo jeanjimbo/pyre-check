@@ -26,26 +26,17 @@ def tito_three(x):
 def tito_max_consecutive(x):
     a = tito_zero(x)
     b = tito_two(a)
-    c = tito_one(b)
-    return c  # Expected depth: 1 + max(0, 2, 1) = 3
+    return tito_one(b)
 
 
 def tito_min_disjoint(x, y):
-    if x:
-        return tito_zero(x)
-    else:
-        return tito_one(x)
+    return tito_zero(x) if x else tito_one(x)
     # Expected depth: 1 + min(0, 1) = 1
 
 
 def tito_min_disjoint_max_consecutive(x, y):
-    if y:
-        a = tito_one(x)
-        b = tito_zero(a)
-    else:
-        a = tito_two(x)
-        b = tito_zero(a)
-    return b  # Expected depth 2
+    a = tito_one(x) if y else tito_two(x)
+    return tito_zero(a)
 
 
 class C:

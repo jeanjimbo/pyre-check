@@ -117,11 +117,12 @@ def _verify_json_rpc_version(json: JSON) -> None:
 
 def _parse_json_rpc_id(json: JSON) -> Union[int, str, None]:
     id = json.get("id")
-    if id is not None and not isinstance(id, int) and not isinstance(id, str):
+    if id is None or isinstance(id, (int, str)):
+        return id
+    else:
         raise InvalidRequestError(
             f"Request ID must be either an integer or string but got {id}"
         )
-    return id
 
 
 def _parse_json_rpc_activity_key(json: JSON) -> Optional[JSON]:

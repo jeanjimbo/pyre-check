@@ -8,15 +8,13 @@ from typing import Dict, Optional
 
 
 def post_0(i: int) -> str:
-    taint = {}
-    taint[i] = _test_source()
+    taint = {i: _test_source()}
     taint[0] = _test_source()
     return taint[0]
 
 
 def post_1(i: int) -> str:
-    taint = {}
-    taint[0] = _test_source()
+    taint = {0: _test_source()}
     taint[i] = _test_source()
     return taint[0]
 
@@ -40,22 +38,19 @@ def post_3(i: int) -> str:
 
 
 def pre_0(x: str, i: int) -> None:
-    taint = {}
-    taint[0] = x
+    taint = {0: x}
     _test_sink(taint[i])
     _test_sink(taint[0])
 
 
 def pre_1(x: str, i: int) -> None:
-    taint = {}
-    taint[0] = x
+    taint = {0: x}
     _test_sink(taint[0])
     _test_sink(taint[i])
 
 
 def pre_2(x: str, i: int) -> None:
-    taint = {}
-    taint[0] = x
+    taint = {0: x}
     if 1 > 2:
         _test_sink(taint[i])
     else:
@@ -63,8 +58,7 @@ def pre_2(x: str, i: int) -> None:
 
 
 def pre_3(x: str, i: int) -> None:
-    taint = {}
-    taint[0] = x
+    taint = {0: x}
     if 1 > 2:
         _test_sink(taint[0])
     else:

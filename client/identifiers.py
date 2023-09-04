@@ -19,7 +19,7 @@ def get_project_identifier(
 ) -> str:
     project_identifier = str(global_root)
     if relative_local_root is not None:
-        project_identifier = project_identifier + "//" + relative_local_root
+        project_identifier = f"{project_identifier}//{relative_local_root}"
     return project_identifier
 
 

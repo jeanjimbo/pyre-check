@@ -176,5 +176,5 @@ class SupportSqlalchemy(ErrorSuppressingCommand):
 
         self._get_and_suppress_errors(local_configuration)
 
-        title = "Suppress errors for {}".format(self._local_root)
+        title = f"Suppress errors for {self._local_root}"
         self._repository.commit_changes(commit=(not self._no_commit), title=title)

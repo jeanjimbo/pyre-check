@@ -332,11 +332,10 @@ class PersistentDaemonQuerier(AbstractDaemonQuerier):
         if isinstance(daemon_response, daemon_query.DaemonQueryFailure):
             return daemon_response
         else:
-            result = [
+            return [
                 response.to_lsp_definition_response()
                 for response in daemon_response.response
             ]
-            return result
 
     async def handle_file_opened(
         self,
@@ -365,12 +364,10 @@ class PersistentDaemonQuerier(AbstractDaemonQuerier):
                 "code_update": ["NewCode", code],
             },
         ]
-        # Response is only used in the event that it is a DaemonConnectionFailure
-        daemon_response = await daemon_connection.attempt_send_async_raw_request(
+        return await daemon_connection.attempt_send_async_raw_request(
             socket_path=self.socket_path,
             request=json.dumps(overlay_update_json),
         )
-        return daemon_response
 
     async def handle_register_client(
         self,

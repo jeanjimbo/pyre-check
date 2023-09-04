@@ -238,9 +238,7 @@ class DocumentUri:
     fragment: str
 
     def to_file_path(self) -> Optional[Path]:
-        if self.scheme == "file":
-            return Path(self.path)
-        return None
+        return Path(self.path) if self.scheme == "file" else None
 
     def unparse(self) -> str:
         return urllib.parse.urlunparse(

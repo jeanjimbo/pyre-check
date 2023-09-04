@@ -295,50 +295,45 @@ async def async_handle_register_client(
     socket_path: Path, register_client: RegisterClient
 ) -> Union[str, daemon_connection.DaemonConnectionFailure]:
     raw_command = json.dumps(["Command", register_client.to_json()])
-    response = await daemon_connection.attempt_send_async_raw_request(
+    return await daemon_connection.attempt_send_async_raw_request(
         socket_path, raw_command
     )
-    return response
 
 
 async def async_handle_dispose_client(
     socket_path: Path, dispose_client: DisposeClient
 ) -> Union[str, daemon_connection.DaemonConnectionFailure]:
     raw_command = json.dumps(["Command", dispose_client.to_json()])
-    response = await daemon_connection.attempt_send_async_raw_request(
+    return await daemon_connection.attempt_send_async_raw_request(
         socket_path, raw_command
     )
-    return response
 
 
 async def async_handle_local_update(
     socket_path: Path, local_update: LocalUpdate
 ) -> Union[str, daemon_connection.DaemonConnectionFailure]:
     raw_command = json.dumps(["Command", local_update.to_json()])
-    response = await daemon_connection.attempt_send_async_raw_request(
+    return await daemon_connection.attempt_send_async_raw_request(
         socket_path, raw_command
     )
-    return response
 
 
 async def async_handle_file_opened(
     socket_path: Path, file_opened: FileOpened
 ) -> Union[str, daemon_connection.DaemonConnectionFailure]:
     raw_command = json.dumps(["Command", file_opened.to_json()])
-    response = await daemon_connection.attempt_send_async_raw_request(
+    return await daemon_connection.attempt_send_async_raw_request(
         socket_path, raw_command
     )
-    return response
 
 
 async def async_handle_file_closed(
     socket_path: Path, file_closed: FileClosed
 ) -> Union[str, daemon_connection.DaemonConnectionFailure]:
     raw_command = json.dumps(["Command", file_closed.to_json()])
-    response = await daemon_connection.attempt_send_async_raw_request(
+    return await daemon_connection.attempt_send_async_raw_request(
         socket_path, raw_command
     )
-    return response
 
 
 async def async_handle_superclasses(
@@ -346,7 +341,6 @@ async def async_handle_superclasses(
     superclasses: SuperclassesRequest,
 ) -> Union[str, daemon_connection.DaemonConnectionFailure]:
     raw_command = json.dumps(["Query", superclasses.to_json()])
-    response = await daemon_connection.attempt_send_async_raw_request(
+    return await daemon_connection.attempt_send_async_raw_request(
         socket_path, raw_command
     )
-    return response

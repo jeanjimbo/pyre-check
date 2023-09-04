@@ -985,7 +985,7 @@ class PyreDaemonLaunchAndSubscribeHandlerTest(testslide.TestCase):
         )
 
         client_messages = [x.decode("utf-8") for x in bytes_writer.items()]
-        self.assertTrue(len(client_messages) == 0)
+        self.assertTrue(not client_messages)
 
     @setup.async_test
     async def test_connections_lost(self) -> None:

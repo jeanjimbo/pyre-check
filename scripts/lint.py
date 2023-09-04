@@ -32,9 +32,7 @@ def _changed_paths() -> list[str]:
         .decode()
         .split()
     )
-    if paths == [""]:
-        return []
-    return paths
+    return [] if paths == [""] else paths
 
 
 def _lint_python(all_paths: list[str]) -> None:

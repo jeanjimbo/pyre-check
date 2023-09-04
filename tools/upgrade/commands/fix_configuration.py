@@ -72,16 +72,16 @@ class FixConfiguration(ErrorSuppressingCommand):
                 buildable_targets.append(target)
             except subprocess.CalledProcessError:
                 LOG.info(f"Removing bad target: {target}")
-                pass
             else:
                 buildable_targets.append(target)
-        if len(buildable_targets) == 0 and not configuration.source_directories:
+        if buildable_targets or configuration.source_directories:
+            configuration.targets = buildable_targets
+            configuration.write()
+
+        else:
             LOG.info(f"Removing empty configuration at: {configuration.get_path()}")
             self._repository.remove_paths([configuration.get_path()])
             self._configuration = None
-        else:
-            configuration.targets = buildable_targets
-            configuration.write()
 
     def _consolidate_nested(self) -> None:
         parent_local_configuration_path = Configuration.find_parent_file(
@@ -107,7 +107,7 @@ class FixConfiguration(ErrorSuppressingCommand):
         self._configuration = parent_local_configuration
 
     def _commit_changes(self) -> None:
-        title = "Fix broken configuration for {}".format(str(self._path))
+        title = f"Fix broken configuration for {str(self._path)}"
         self._repository.commit_changes(
             commit=(not self._no_commit),
             title=title,
@@ -121,9 +121,7 @@ class FixConfiguration(ErrorSuppressingCommand):
         self._remove_bad_targets()
         self._consolidate_nested()
 
-        # Clean any revealed errors.
-        configuration = self._configuration
-        if configuration:
+        if configuration := self._configuration:
             try:
                 self._get_and_suppress_errors(configuration)
             except UserError as error:

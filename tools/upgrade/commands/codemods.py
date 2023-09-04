@@ -77,7 +77,7 @@ class MissingOverrideReturnAnnotations(Command):
                 LOG.info("Looking at %d: %s", line, lines[line])
                 while True:
                     if "):" in lines[line]:
-                        lines[line] = lines[line].replace("):", ") -> %s:" % annotation)
+                        lines[line] = lines[line].replace("):", f") -> {annotation}:")
                         LOG.info("%d: %s", line, lines[line])
                         break
                     else:
@@ -134,7 +134,7 @@ class MissingGlobalAnnotations(Command):
 
                 LOG.info("Looking at %d: %s", line, lines[line])
                 if " =" in lines[line]:
-                    lines[line] = lines[line].replace(" =", ": %s =" % annotation)
+                    lines[line] = lines[line].replace(" =", f": {annotation} =")
                     LOG.info("%d: %s", line, lines[line])
 
             path.write_text("\n".join(lines))

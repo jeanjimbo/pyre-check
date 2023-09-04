@@ -63,11 +63,10 @@ class LeakAnalysisResult:
 
 def is_valid_callee(callee: str) -> bool:
     components = callee.strip().split(".")
-    is_valid_callee = all(
+    return all(
         component.isidentifier() and not keyword.iskeyword(component)
         for component in components
     )
-    return is_valid_callee
 
 
 def partition_valid_invalid_callees(callees: List[str]) -> Tuple[List[str], List[str]]:
@@ -232,8 +231,7 @@ def validate_json_list(json_list: JSON, from_file: str, level: str) -> None:
 def find_issues_in_callables(callables_file: TextIO, project_path: str) -> LeakAnalysisResult:
     callables = load_json_from_file(callables_file, "CALLABLES_FILE")
     validate_json_list(callables, "CALLABLES_FILE", "top level")
-    issues = find_issues(cast(List[str], callables), Path(project_path))
-    return issues
+    return find_issues(cast(List[str], callables), Path(project_path))
 
 @click.group()
 def analyze() -> None:

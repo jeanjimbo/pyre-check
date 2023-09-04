@@ -48,13 +48,12 @@ class Timer:
         """
         if get_current_time_in_nanosecond is not None:
             self.get_current_time_in_nanosecond = get_current_time_in_nanosecond
+        elif (sys.version_info.major, sys.version_info.minor) >= (3, 7):
+            self.get_current_time_in_nanosecond = time.perf_counter_ns
         else:
-            if (sys.version_info.major, sys.version_info.minor) >= (3, 7):
-                self.get_current_time_in_nanosecond = time.perf_counter_ns
-            else:
-                self.get_current_time_in_nanosecond = lambda: int(
-                    time.perf_counter() * 1e9
-                )
+            self.get_current_time_in_nanosecond = lambda: int(
+                time.perf_counter() * 1e9
+            )
         self.reset()
 
     def reset(self) -> None:

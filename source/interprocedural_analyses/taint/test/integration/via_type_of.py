@@ -36,10 +36,7 @@ def test1_alarm4(foo):
     # via-type:int, via-type:str, via-type:typing.Annotated[str]
     c = Test1_C(_test_source())
     foo = c.x
-    if 1:
-        foo = c.y
-    elif 2:
-        foo = c.z
+    foo = c.y
     _test_sink(foo)
 
 
@@ -71,10 +68,7 @@ def test2_alarm4(foo):
     # via-type:Dict[str, int], via-type:List[str], via-type:float
     c = Test2_C(_test_source())
     foo = c.x
-    if 1:
-        foo = c.y
-    elif 2:
-        foo = c.z
+    foo = c.y
     _test_sink(foo)
 
 
@@ -108,10 +102,7 @@ def test3_alarm4(c: Test3_C, foo):
     # via-type:Test3_Foo,
     # via-type:typing.Annotated[List[List[str]]
     foo = c.x
-    if 1:
-        foo = c.y
-    elif 2:
-        foo = c.z
+    foo = c.y
     _test_sink(foo)
 
 
@@ -165,8 +156,7 @@ def tito(parameter, other):
 
 
 def test_tito():
-    a = tito(_test_source(), [1, 2])
-    return a
+    return tito(_test_source(), [1, 2])
 
 
 def sink_via_type_of(x, y):

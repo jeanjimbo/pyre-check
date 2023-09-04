@@ -35,12 +35,10 @@ def _get_configuration_path(local_configuration: Optional[Path]) -> Optional[Pat
     )
     if found_root is None:
         return None
+    if local_root := found_root.local_root:
+        return local_root / LOCAL_CONFIGURATION_FILE
     else:
-        local_root = found_root.local_root
-        if local_root:
-            return local_root / LOCAL_CONFIGURATION_FILE
-        else:
-            return found_root.global_root / CONFIGURATION_FILE
+        return found_root.global_root / CONFIGURATION_FILE
 
 
 class StrictDefault(ErrorSuppressingCommand):
@@ -102,11 +100,8 @@ class StrictDefault(ErrorSuppressingCommand):
         )
 
     def _commit_changes(self) -> None:
+        summary = f"Turning on strict default; files with more than {self._fixme_threshold} errors opted-out of strict."
         title = f"Convert {self._local_configuration} to use strict default"
-        summary = (
-            "Turning on strict default; files with more than "
-            + f"{self._fixme_threshold} errors opted-out of strict."
-        )
         self._repository.commit_changes(
             commit=(not self._no_commit),
             title=title,
