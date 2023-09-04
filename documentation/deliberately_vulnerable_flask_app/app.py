@@ -36,8 +36,7 @@ def potential_rce_2(payload: int) -> None:
 @app.route("/pt/<string:payload>")
 def definite_pt(payload: str) -> str:
     f = open(payload, "r")
-    text = f.read()
-    return text
+    return f.read()
 
 @app.route("/xss/<string:payload>")
 def definite_xss(payload: str) -> None:
@@ -72,9 +71,7 @@ def user_data_to_getattr_tn(payload: str) -> None:
 
 @app.route("/user_data_to_filesystem_read_write_tp/<path:payload>")
 def user_data_to_filesystem_read_write_tp(payload: Path) -> None:
-    with open(payload) as f:
-        data = f.read()
-    return data
+    return Path(payload).read_text()
 
 @app.route("/open_redirect_tp/<string:payload>")
 def open_redirect_tp(payload: str) -> None:
@@ -97,8 +94,8 @@ def user_controlled_data_to_email_send_to_users_tn(payload: str) -> None:
 
 @app.route("/user_controlled_data_flows_into_url_like_string_tp/<string:payload>")
 def user_controlled_data_flows_into_url_like_string_tp(payload: str) -> None:
-    url = "https://test/" + payload # noqa
+    url = f"https://test/{payload}"
 
 @app.route("/user_controlled_data_flows_into_url_like_string_tn/<string:payload>")
 def user_controlled_data_flows_into_url_like_string_tn(payload: str) -> None:
-    url = "test/" + payload # noqa
+    url = f"test/{payload}"

@@ -42,10 +42,10 @@ class ErrorKind(enum.Enum):
 
     @staticmethod
     def from_string(input_string: str) -> "ErrorKind":
-        for item in ErrorKind:
-            if input_string == str(item):
-                return item
-        return ErrorKind.UNKNOWN
+        return next(
+            (item for item in ErrorKind if input_string == str(item)),
+            ErrorKind.UNKNOWN,
+        )
 
 
 @dataclasses.dataclass
@@ -60,18 +60,22 @@ Event = Union[SocketCreated, ServerInitialized, ServerException]
 def create_from_string(input_string: str) -> Optional[Event]:
     try:
         input_json: List[str] = json.loads(input_string)
-        if len(input_json) < 1:
+        if not input_json:
             return None
 
         input_kind = input_json[0]
-        if input_kind == "SocketCreated":
-            if len(input_json) < 2:
-                return None
-            else:
-                return SocketCreated(socket_path=Path(input_json[1]))
+        if (
+            input_kind == "SocketCreated"
+            and len(input_json) < 2
+            or input_kind
+            not in ["SocketCreated", "ServerInitialized", "Exception"]
+        ):
+            return None
+        elif input_kind == "SocketCreated":
+            return SocketCreated(socket_path=Path(input_json[1]))
         elif input_kind == "ServerInitialized":
             return ServerInitialized()
-        elif input_kind == "Exception":
+        else:
             if len(input_json) < 2:
                 return None
             if not isinstance(input_json[1], str):
@@ -86,8 +90,6 @@ def create_from_string(input_string: str) -> Optional[Event]:
                     message=input_json[1], kind=ErrorKind.from_string(input_json[2][0])
                 )
             return ServerException(message=input_json[1], kind=ErrorKind.UNKNOWN)
-        else:
-            return None
     except json.JSONDecodeError:
         return None
 

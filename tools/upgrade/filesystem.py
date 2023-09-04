@@ -34,7 +34,7 @@ class LocalMode(Enum):
         return "^[ \t]*# *" + self.value + " *$"
 
     def get_comment(self) -> str:
-        return "# " + self.value
+        return f"# {self.value}"
 
 
 class Target(NamedTuple):
@@ -74,15 +74,15 @@ class TargetCollector(builtin_ast.NodeVisitor):
     def _get_name(
         self, field: builtin_ast.keyword, name: Optional[str]
     ) -> Optional[str]:
-        value = field.value
         if field.arg == "name":
+            value = field.value
             if isinstance(value, builtin_ast.Str):
                 return value.s
         return name
 
     def _get_check_types(self, field: builtin_ast.keyword, check_types: bool) -> bool:
-        value = field.value
         if field.arg == "check_types":
+            value = field.value
             if isinstance(value, builtin_ast.NameConstant):
                 return check_types or value.value
         return check_types
@@ -100,8 +100,8 @@ class TargetCollector(builtin_ast.NodeVisitor):
         return is_strict
 
     def _get_uses_pyre(self, field: builtin_ast.keyword, uses_pyre: bool) -> bool:
-        value = field.value
         if field.arg == "check_types_options":
+            value = field.value
             if isinstance(value, builtin_ast.Str):
                 return uses_pyre and "mypy" not in value.s.lower()
         return uses_pyre
@@ -135,8 +135,8 @@ def path_exists(filename: str) -> Path:
 def find_targets(search_root: Path, pyre_only: bool = False) -> Dict[str, List[Target]]:
     LOG.info("Finding typecheck targets in %s", search_root)
     target_files = find_files(search_root, "TARGETS")
-    target_names = {}
     total_targets = 0
+    target_names = {}
     for target_file in target_files:
         target_finder = TargetCollector(pyre_only)
         with open(target_file, "r") as source:
@@ -148,8 +148,7 @@ def find_targets(search_root: Path, pyre_only: bool = False) -> Dict[str, List[T
                 total_targets += len(targets)
 
     LOG.info(
-        f"Found {total_targets} typecheck targets in {len(target_names)} "
-        + "TARGETS files to analyze"
+        f"Found {total_targets} typecheck targets in {len(target_names)} TARGETS files to analyze"
     )
     return target_names
 
@@ -206,7 +205,7 @@ def add_local_mode(filename: str, mode: LocalMode) -> None:
     for line in lines:
         if not past_header and not is_header(line):
             past_header = True
-            if len(new_lines) != 0:
+            if new_lines:
                 new_lines.append("")
             new_lines.append(mode.get_comment())
         new_lines.append(line)
@@ -278,11 +277,12 @@ def get_filesystem() -> Filesystem:
 
 
 def remove_non_pyre_ignores(subdirectory: Path) -> None:
-    python_files = [
+    if python_files := [
         subdirectory / path
-        for path in get_filesystem().list(str(subdirectory), patterns=[r"**/*.py"])
-    ]
-    if python_files:
+        for path in get_filesystem().list(
+            str(subdirectory), patterns=[r"**/*.py"]
+        )
+    ]:
         LOG.info("...cleaning %s python files", len(python_files))
         remove_type_ignore_command = [
             "sed",

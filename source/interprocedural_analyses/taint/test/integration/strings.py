@@ -7,11 +7,11 @@ from builtins import _test_sink, _test_source
 
 
 def concatenate_lhs(source: str):
-    return source + "A"
+    return f"{source}A"
 
 
 def concatenate_rhs(source: str):
-    return "A" + source
+    return f"A{source}"
 
 
 def bad_1():
@@ -25,26 +25,17 @@ def bad_2():
 
 
 def either(b: bool):
-    if b:
-        a = concatenate_lhs(_test_source())
-    else:
-        a = concatenate_rhs(_test_source())
+    a = concatenate_lhs(_test_source()) if b else concatenate_rhs(_test_source())
     _test_sink(a)
 
 
 def maybe_lhs(b: bool):
-    if b:
-        a = concatenate_lhs(_test_source())
-    else:
-        a = _test_source()
+    a = concatenate_lhs(_test_source()) if b else _test_source()
     _test_sink(a)
 
 
 def maybe_rhs(b: bool):
-    if b:
-        a = _test_source()
-    else:
-        a = concatenate_rhs(_test_source())
+    a = _test_source() if b else concatenate_rhs(_test_source())
     _test_sink(a)
 
 
@@ -56,14 +47,14 @@ def through_iadd():
 
 
 def format_tito(x):
-    return "a {}".format(x)
+    return f"a {x}"
 
 
 def format_source():
     x = _test_source()
-    return "a {}".format(x)
+    return f"a {x}"
 
 
 def format_sink(x):
-    y = "a {}".format(x)
+    y = f"a {x}"
     _test_sink(y)

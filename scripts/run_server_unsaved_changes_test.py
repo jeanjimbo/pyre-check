@@ -128,7 +128,6 @@ class Repository:
             self._pyre_directory, typeshed_path, base_directory
         )
         self.socket_path: pathlib.Path = self.start_pyre_and_return_socket_path()
-        pass
 
     @staticmethod
     def _initialize_pyre_directory(
@@ -173,8 +172,7 @@ class Repository:
         socket_path = self.socket_path
         with connect_in_text_mode(socket_path) as (input_stream, output_stream):
             output_stream.write(f"{request_message}\n")
-            result = input_stream.readline().strip()
-            return result
+            return input_stream.readline().strip()
 
     def overlay_update(self, file_path: pathlib.Path) -> str:
         file_contents = pathlib.Path(file_path).read_text()
@@ -257,10 +255,9 @@ def _get_file_errors_result(
     overlay_errors_response = repository.overlay_update(file_path)
     repository.modify_file(file_path)
     incremental_errors_response = repository.incremental_update(file_path)
-    commit_result = FileErrorsResult(
+    return FileErrorsResult(
         file_path, overlay_errors_response, incremental_errors_response
     )
-    return commit_result
 
 
 def run_unsaved_changes_test(
@@ -300,20 +297,12 @@ def run_unsaved_changes_test(
 def _print_discrepancies(
     discrepancies: Dict[pathlib.Path, Tuple[str, str]], commit: str
 ) -> int:
-    if len(discrepancies) == 0:
+    if not discrepancies:
         return 0
     for file_name, (actual_error, expected_error) in discrepancies.items():
-        LOG.error(
-            "Difference found for revision: {}, file_name: {}\n".format(
-                commit, file_name
-            ),
-        )
-        LOG.error(
-            "Actual errors (pyre overlayUpdate): {}\n".format(actual_error),
-        )
-        LOG.error(
-            "Expected errors (pyre incremental): {}\n".format(expected_error),
-        )
+        LOG.error(f"Difference found for revision: {commit}, file_name: {file_name}\n")
+        LOG.error(f"Actual errors (pyre overlayUpdate): {actual_error}\n")
+        LOG.error(f"Expected errors (pyre incremental): {expected_error}\n")
     return 1
 
 

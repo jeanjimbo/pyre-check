@@ -29,11 +29,10 @@ def sanitize_a_sink_tito(x):
 
 
 def partial_issue_sources():
-    if 1 > 2:
-        x = a_source_x()
-        return sanitize_a_sink_tito(x)
-    else:
+    if 1 <= 2:
         return a_source_y()
+    x = a_source_x()
+    return sanitize_a_sink_tito(x)
 
 
 def partial_issue_sinks(x):

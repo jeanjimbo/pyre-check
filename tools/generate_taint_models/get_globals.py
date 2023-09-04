@@ -91,7 +91,7 @@ class GlobalModelGenerator(ModelGenerator[Model]):
                     if isinstance(callee, ast.Name) and callee.id == "namedtuple":
                         return
                 # Omit pure aliases of the form `x = alias`.
-                if isinstance(value, ast.Name) or isinstance(value, ast.Attribute):
+                if isinstance(value, (ast.Name, ast.Attribute)):
                     return
                 # x = lambda: _ can safely be avoided, as the models confuse our taint
                 # analysis.
@@ -159,15 +159,12 @@ class GlobalModelGenerator(ModelGenerator[Model]):
             elif isinstance(statement, ast.AugAssign):
                 visitor.visit(statement.target)
 
-            # Don't attempt to register statements of the form `x: int`.
             elif isinstance(statement, ast.AnnAssign):
                 value = statement.value
                 if value is not None:
                     visit_assignment(statement.target, value)
 
-            elif isinstance(statement, ast.FunctionDef) or isinstance(
-                statement, ast.AsyncFunctionDef
-            ):
+            elif isinstance(statement, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 for decorator in statement.decorator_list:
                     if _is_cached_property_decorator(decorator):
                         cached_properties.add((visitor.parent, statement))
@@ -252,7 +249,7 @@ class GlobalModelGenerator(ModelGenerator[Model]):
         stub_root = self.stub_root
         if stub_root is not None:
             stub_root = os.path.abspath(stub_root)
-            paths = glob.glob(stub_root + "/**/*.pyi", recursive=True)
+            paths = glob.glob(f"{stub_root}/**/*.pyi", recursive=True)
             for path in paths:
                 sinks = sinks.union(self._globals(stub_root, path))
         return sinks
@@ -273,9 +270,7 @@ def _is_cached_property_decorator(decorator: ast.expr) -> bool:
         name = decorator.attr
     else:
         name = None
-    if name is None:
-        return False
-    return "cached" in name and "property" in name
+    return False if name is None else "cached" in name and "property" in name
 
 
 def _is_class_property_decorator(decorator: ast.expr) -> bool:
@@ -285,6 +280,4 @@ def _is_class_property_decorator(decorator: ast.expr) -> bool:
         name = decorator.attr
     else:
         name = None
-    if name is None:
-        return False
-    return "class" in name and "property" in name
+    return False if name is None else "class" in name and "property" in name

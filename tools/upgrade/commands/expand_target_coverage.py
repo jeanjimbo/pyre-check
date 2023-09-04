@@ -74,7 +74,7 @@ class ExpandTargetCoverage(ErrorSuppressingCommand):
 
         # Do not change if configurations exist below given root
         existing_configurations = find_files(local_root, ".pyre_configuration.local")
-        if existing_configurations and not existing_configurations == [
+        if existing_configurations and existing_configurations != [
             str(local_root / ".pyre_configuration.local")
         ]:
             LOG.warning(
@@ -91,7 +91,7 @@ class ExpandTargetCoverage(ErrorSuppressingCommand):
         LOG.info("Expanding typecheck targets in `%s`", local_configuration)
         configuration = Configuration(local_configuration)
         existing_targets = configuration.targets
-        glob_target = "//{}/...".format(str(local_root))
+        glob_target = f"//{str(local_root)}/..."
         if existing_targets == [glob_target]:
             LOG.info("Configuration is already fully expanded.")
             return

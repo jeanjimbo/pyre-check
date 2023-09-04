@@ -69,10 +69,7 @@ class Annotation:
 class CallGraphTarget:
     def __init__(self, call: Dict[str, Any]) -> None:
         self.target: str = ""
-        if "target" in call:
-            self.target = call["target"]
-        else:
-            self.target = call["direct_target"]
+        self.target = call.get("target", call["direct_target"])
         self.kind: str = call["kind"]
         self.locations: List[Location] = [
             _parse_location(location) for location in call["locations"]
@@ -94,11 +91,7 @@ class ClassHierarchy:
     @property
     @lru_cache(maxsize=1)
     def reverse_hierarchy(self) -> Dict[str, List[str]]:
-        reversed_mapping = {}
-        # In order to distinguish between missing types and types
-        # with no subclasses, we initialize everything to [] for known keys.
-        for key in self.hierarchy:
-            reversed_mapping[key] = []
+        reversed_mapping = {key: [] for key in self.hierarchy}
         for key, values in self.hierarchy.items():
             for value in values:
                 reversed_mapping[value].append(key)
@@ -127,7 +120,7 @@ class InvalidModel(NamedTuple):
 
 
 def _defines(pyre_connection: PyreConnection, modules: Iterable[str]) -> List[Define]:
-    query = "defines({})".format(",".join(modules))
+    query = f'defines({",".join(modules)})'
     result = pyre_connection.query_server(query)
     return [
         Define(
@@ -154,7 +147,7 @@ def defines(
         return _defines(pyre_connection, modules)
     if batch_size <= 0:
         raise ValueError(
-            "batch_size must a positive integer, provided: `{}`".format(batch_size)
+            f"batch_size must a positive integer, provided: `{batch_size}`"
         )
     found_defines: List[Define] = []
     module_chunks = [
@@ -235,14 +228,12 @@ def _get_batch(
         yield iterable
     elif batch_size <= 0:
         raise ValueError(
-            "batch_size must a positive integer, provided: `{}`".format(batch_size)
+            f"batch_size must a positive integer, provided: `{batch_size}`"
         )
     else:
         iterator = iter(iterable)
-        batch = list(islice(iterator, batch_size))
-        while batch:
+        while batch := list(islice(iterator, batch_size)):
             yield batch
-            batch = list(islice(iterator, batch_size))
 
 
 def _get_attributes(
@@ -268,7 +259,7 @@ def get_attributes(
 ) -> Dict[str, List[Attributes]]:
     all_responses = {}
     for batch in _get_batch(class_names, batch_size):
-        query = "batch({})".format(", ".join([f"attributes({name})" for name in batch]))
+        query = f'batch({", ".join([f"attributes({name})" for name in batch])})'
         responses = pyre_connection.query_server(query)["response"]
         for class_name, response in zip(batch, responses):
             if "response" in response:
@@ -293,11 +284,10 @@ def get_call_graph(
     pyre_connection: PyreConnection,
 ) -> Optional[Dict[str, List[CallGraphTarget]]]:
     response = pyre_connection.query_server("dump_call_graph()")["response"]
-    call_graph = {}
-
-    for function, calls in response.items():
-        call_graph[function] = [CallGraphTarget(call) for call in calls]
-    return call_graph
+    return {
+        function: [CallGraphTarget(call) for call in calls]
+        for function, calls in response.items()
+    }
 
 
 def _parse_location(location_json: Dict[str, Any]) -> Location:
@@ -325,16 +315,16 @@ def get_invalid_taint_models(
     )
     if "response" in response and "errors" in response["response"]:
         found_errors = response["response"]["errors"]
-        for error in found_errors:
-            errors.append(
-                InvalidModel(
-                    full_error_message=error["description"],
-                    path=error["path"],
-                    line=error["line"],
-                    column=error["column"],
-                    stop_line=error["stop_line"],
-                    stop_column=error["stop_column"],
-                    fully_qualified_name="",
-                )
+        errors.extend(
+            InvalidModel(
+                full_error_message=error["description"],
+                path=error["path"],
+                line=error["line"],
+                column=error["column"],
+                stop_line=error["stop_line"],
+                stop_column=error["stop_column"],
+                fully_qualified_name="",
             )
+            for error in found_errors
+        )
     return errors

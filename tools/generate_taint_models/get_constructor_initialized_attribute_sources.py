@@ -86,7 +86,7 @@ class ConstructorInitializedAttributeSourceGenerator(ModelGenerator[AssignmentMo
                         target=target, annotation=self.taint_annotation
                     )
 
-                if "_" + parameter.name in attributes:
+                if f"_{parameter.name}" in attributes:
                     # Same as above, but parameters might be prefixed with an
                     # underscore to indicate a private attribute.
                     target = f"{class_name}._{parameter.name}"

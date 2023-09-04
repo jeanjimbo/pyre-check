@@ -318,8 +318,7 @@ class ModelTest(unittest.TestCase):
 
         self.assertEqual(model_1, model_2)
 
-        test_set = set()
-        test_set.add(model_1)
+        test_set = {model_1}
         # Checking for 'model_2' despite putting in 'model_1' is deliberate; we
         # are testing the effectiveness of the hash equivalence
         self.assertIn(model_2, test_set)
@@ -335,10 +334,10 @@ class ModelTest(unittest.TestCase):
     def test_raw_callable_model(self) -> None:
 
         with patch.object(
-            model.RawCallableModel,
-            "_get_fully_qualified_callable_name",
-            return_value="qualified.C.name",
-        ):
+                model.RawCallableModel,
+                "_get_fully_qualified_callable_name",
+                return_value="qualified.C.name",
+            ):
             with patch.object(
                 model.RawCallableModel,
                 "_generate_parameters",
@@ -485,13 +484,13 @@ class ModelTest(unittest.TestCase):
                 )
 
             with patch.object(
-                model.RawCallableModel,
-                "_generate_parameters",
-                return_value=[
-                    model.Parameter("a", None, model.Parameter.Kind.ARG),
-                    model.Parameter("b", None, model.Parameter.Kind.ARG),
-                ],
-            ):
+                        model.RawCallableModel,
+                        "_generate_parameters",
+                        return_value=[
+                            model.Parameter("a", None, model.Parameter.Kind.ARG),
+                            model.Parameter("b", None, model.Parameter.Kind.ARG),
+                        ],
+                    ):
                 # pyre-ignore[45]: Cannot instantiate abstract class
                 model_1 = model.RawCallableModel(
                     parameter_annotation=AllParametersAnnotation(
@@ -512,8 +511,7 @@ class ModelTest(unittest.TestCase):
                 )
                 self.assertEqual(model_1, model_2)
 
-                test_set = set()
-                test_set.add(model_1)
+                test_set = {model_1}
                 # Checking for 'model_2' despite putting in 'model_1' is deliberate; we
                 # are testing the effectiveness of the hash equivalence
                 self.assertIn(model_2, test_set)
@@ -559,8 +557,7 @@ class ModelTest(unittest.TestCase):
 
         self.assertEqual(model_1, model_2)
 
-        test_set = set()
-        test_set.add(model_1)
+        test_set = {model_1}
         # Checking for 'model_2' despite putting in 'model_1' is deliberate; we
         # are testing the effectiveness of the hash equivalence
         self.assertIn(model_2, test_set)

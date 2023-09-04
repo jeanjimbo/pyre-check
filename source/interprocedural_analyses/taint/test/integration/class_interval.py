@@ -242,10 +242,7 @@ class A6:
 
 class B6(A6):
     def m0(self):
-        if 1 == 1:
-            return _test_source()  # Interval: (-∞,+∞) /\ [2,5] = [2,5]
-        else:
-            return E6().m3()  # Interval: [2,5]
+        return _test_source() if True else E6().m3()
 
 
 class C6(A6):
@@ -286,8 +283,7 @@ class A7(object):
         return x
 
     def f(self, b: B7):
-        y = b.foo()  # Interval: [1,2]
-        return y
+        return b.foo()
 
 
 """
@@ -340,9 +336,9 @@ def call_method_via_class_name(a: A9):
 class A10:
     f: int = 0
 
-    def object_target(x):
+    def object_target(self):
         a = A10()
-        a.f = x
+        a.f = self
 
 
 class A12:

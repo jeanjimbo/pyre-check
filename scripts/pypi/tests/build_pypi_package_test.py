@@ -36,11 +36,11 @@ class TestCreatingWheel(unittest.TestCase):
             _add_init_files(path, "version")
             # Assert the expected __init__ files are present
             init_files = [str(path) for path in path.glob("**/*.py")]
-            self.assertTrue(build_root + "/pyre_check/__init__.py" in init_files)
-            self.assertTrue(build_root + "/pyre_check/client/__init__.py" in init_files)
-            self.assertTrue(build_root + "/pyre_check/tools/__init__.py" in init_files)
+            self.assertTrue(f"{build_root}/pyre_check/__init__.py" in init_files)
+            self.assertTrue(f"{build_root}/pyre_check/client/__init__.py" in init_files)
+            self.assertTrue(f"{build_root}/pyre_check/tools/__init__.py" in init_files)
             self.assertTrue(
-                build_root + "/pyre_check/tools/upgrade/__init__.py" in init_files
+                f"{build_root}/pyre_check/tools/upgrade/__init__.py" in init_files
             )
 
     def test_sync_files(self) -> None:

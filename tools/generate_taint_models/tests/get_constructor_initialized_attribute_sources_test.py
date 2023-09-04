@@ -104,9 +104,8 @@ class ConstructorInitializedAttributeSourceGeneratorTest(unittest.TestCase):
                 ConstructorInitializedAttributeSourceGenerator(
                     classes_to_taint=[f"{qualifier}.TestClass"],
                     pyre_connection=MagicMock(),
-                    filter_classes_by=(
-                        lambda module: not module.__name__ == "TestChildClassB"
-                    ),
+                    filter_classes_by=lambda module: module.__name__
+                    != "TestChildClassB",
                     taint_annotation="Taint",
                 ).gather_functions_to_model()
             ),

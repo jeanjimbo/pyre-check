@@ -95,7 +95,7 @@ def switch_environment(environment: Mapping[str, str]) -> Generator[None, None, 
         yield
     finally:
         os.environ.clear()
-        os.environ.update(old_environment)
+        os.environ |= old_environment
 
 
 def async_test(func: Callable[TParams, Awaitable[T]]) -> Callable[TParams, T]:

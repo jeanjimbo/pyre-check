@@ -34,8 +34,7 @@ def transform_z(arg):
 
 def taint_with_transform_x():
     alpha = source_a()
-    beta = transform_x(alpha)
-    return beta
+    return transform_x(alpha)
 
 
 def transform_x_obscure(arg):
@@ -44,8 +43,7 @@ def transform_x_obscure(arg):
 
 def taint_with_transform_x_obscure():
     alpha = source_a()
-    beta = transform_x_obscure(alpha)
-    return beta
+    return transform_x_obscure(alpha)
 
 
 def transform_x_skip_obscure(arg):
@@ -54,28 +52,24 @@ def transform_x_skip_obscure(arg):
 
 def taint_with_transform_x_skip_obscure():
     alpha = source_a()
-    beta = transform_x_skip_obscure(alpha)
-    return beta
+    return transform_x_skip_obscure(alpha)
 
 
 def taint_with_transform_yx():
     alpha = source_a()
     beta = transform_x(alpha)
-    gamma = transform_y(beta)
-    return gamma
+    return transform_y(beta)
 
 
 def no_source_taint_with_transform_z():
     alpha = source_a()
-    beta = transform_z(alpha)
-    return beta
+    return transform_z(alpha)
 
 
 def no_source_taint_with_transform_zx():
     alpha = source_a()
     beta = transform_x(alpha)
-    gamma = transform_z(beta)
-    return gamma
+    return transform_z(beta)
 
 
 def a_to_b_no_issue():
@@ -140,25 +134,21 @@ def sink_taint_with_transform_yz(arg):
 
 
 def tito_with_transform_x(arg):
-    alpha = transform_x(arg)
-    return alpha
+    return transform_x(arg)
 
 
 def tito_with_transform_yz(arg):
     alpha = transform_y(arg)
-    beta = transform_z(alpha)
-    return beta
+    return transform_z(alpha)
 
 
 def nested_tito_transform_x(arg):
-    alpha = tito_with_transform_x(arg)
-    return alpha
+    return tito_with_transform_x(arg)
 
 
 def source_taint_via_tito_tranform_yz():
     alpha = source_a()
-    beta = tito_with_transform_yz(alpha)
-    return beta
+    return tito_with_transform_yz(alpha)
 
 
 def sink_taint_via_tito_transform_yz(arg):
@@ -178,8 +168,7 @@ def a_to_yzb_issue():
 
 def source_taint_with_transform_y():
     alpha = source_a()
-    beta = transform_y(alpha)
-    return beta
+    return transform_y(alpha)
 
 
 def sink_taint_with_transform_z(arg):
@@ -262,15 +251,13 @@ def sanitize_sink_d_tito(arg):
 
 def sanitize_a_transform_x(arg):
     alpha = sanitize_source_a_tito(arg)
-    beta = transform_x(alpha)
-    return beta
+    return transform_x(alpha)
 
 
 def sanitize_a_transform_x_sanitize_c_transform_y(arg):
     alpha = sanitize_a_transform_x(arg)
     beta = sanitize_source_c_tito(alpha)
-    gamma = transform_y(beta)
-    return gamma
+    return transform_y(beta)
 
 
 # ... -> source sanitizer -> ... (no transforms)
@@ -294,8 +281,7 @@ def a_to_x_to_sanitize_a_to_b_issue():
 
 def transform_x_sanitize_a_tito(arg):
     alpha = transform_x(arg)
-    beta = sanitize_source_a_tito(alpha)
-    return beta
+    return sanitize_source_a_tito(alpha)
 
 
 def a_to_x_sanitize_a_to_b_issue():
@@ -343,8 +329,7 @@ def a_to_sanitize_a_to_x_to_b_no_issue():
 
 def sanitize_a_transform_x_tito(arg):
     alpha = sanitize_source_a_tito(arg)
-    beta = transform_x(alpha)
-    return beta
+    return transform_x(alpha)
 
 
 def a_to_sanitize_a_x_to_b_no_issue():
@@ -397,8 +382,7 @@ def a_to_x_to_sanitize_b_to_b_no_issue():
 
 def transform_x_sanitize_b_tito(arg):
     alpha = transform_x(arg)
-    beta = sanitize_sink_b_tito(alpha)
-    return beta
+    return sanitize_sink_b_tito(alpha)
 
 
 def a_to_x_sanitize_b_to_b_no_issue():
@@ -410,8 +394,7 @@ def a_to_x_sanitize_b_to_b_no_issue():
 def source_a_transform_x_sanitize_b_taint():
     alpha = source_a()
     beta = transform_x(alpha)
-    gamma = sanitize_sink_b_tito(beta)
-    return gamma
+    return sanitize_sink_b_tito(beta)
 
 
 def a_x_sanitize_b_to_b_no_issue():
@@ -423,8 +406,7 @@ def source_a_transform_y_transform_z_sanitize_b_no_taint():
     alpha = source_a()
     beta = transform_y(alpha)
     gamma = transform_z(beta)
-    delta = sanitize_sink_b_tito(gamma)
-    return delta
+    return sanitize_sink_b_tito(gamma)
 
 
 # ... -> sink sanitizer -> transforms -> ...
@@ -439,8 +421,7 @@ def a_to_sanitize_b_to_x_to_b_issue():
 
 def sanitize_b_transform_x_tito(arg):
     alpha = sanitize_sink_b_tito(arg)
-    beta = transform_x(alpha)
-    return beta
+    return transform_x(alpha)
 
 
 def a_to_sanitize_b_x_to_b_issue():
@@ -451,8 +432,7 @@ def a_to_sanitize_b_x_to_b_issue():
 
 def source_a_sanitize_b_taint():
     alpha = source_a()
-    beta = sanitize_sink_b_tito(alpha)
-    return beta
+    return sanitize_sink_b_tito(alpha)
 
 
 def a_sanitize_b_to_x_to_b_issue():
@@ -469,8 +449,7 @@ def a_sanitize_b_to_xb_issue():
 def source_a_sanitize_b_transform_x_taint():
     alpha = source_a()
     beta = sanitize_sink_b_tito(alpha)
-    gamma = transform_x(beta)
-    return gamma
+    return transform_x(beta)
 
 
 def a_sanitize_b_x_to_b_issue():
@@ -526,72 +505,61 @@ def no_issue_transform_x_tito_sanitize_return():
 
 def tito_propagation_source_sanitizer_1(arg):
     alpha = sanitize_a_transform_x_tito(arg)
-    beta = sanitize_source_c_tito(alpha)
-    return beta
+    return sanitize_source_c_tito(alpha)
 
 
 def tito_propagation_source_sanitizer_2(arg):
     alpha = sanitize_source_c_tito(arg)
-    beta = sanitize_a_transform_x_tito(alpha)
-    return beta
+    return sanitize_a_transform_x_tito(alpha)
 
 
 def tito_propagation_source_sanitizer_3(arg):
     alpha = transform_x_sanitize_a_tito(arg)
-    beta = sanitize_source_c_tito(alpha)
-    return beta
+    return sanitize_source_c_tito(alpha)
 
 
 def tito_propagation_source_sanitizer_4(arg):
     alpha = sanitize_source_c_tito(arg)
-    beta = transform_x_sanitize_a_tito(alpha)
-    return beta
+    return transform_x_sanitize_a_tito(alpha)
 
 
 def tito_propagation_sink_sanitizer_1(arg):
     alpha = sanitize_b_transform_x_tito(arg)
-    beta = sanitize_sink_d_tito(alpha)
-    return beta
+    return sanitize_sink_d_tito(alpha)
 
 
 def tito_propagation_sink_sanitizer_2(arg):
     alpha = sanitize_sink_d_tito(arg)
-    beta = sanitize_b_transform_x_tito(alpha)
-    return beta
+    return sanitize_b_transform_x_tito(alpha)
 
 
 def tito_propagation_sink_sanitizer_3(arg):
     alpha = transform_x_sanitize_b_tito(arg)
-    beta = sanitize_sink_d_tito(alpha)
-    return beta
+    return sanitize_sink_d_tito(alpha)
 
 
 def tito_propagation_sink_sanitizer_4(arg):
     alpha = sanitize_sink_d_tito(arg)
-    beta = transform_x_sanitize_b_tito(alpha)
-    return beta
+    return transform_x_sanitize_b_tito(alpha)
 
 
 def transform_y_sanitize_b_tito(arg):
     alpha = transform_y(arg)
-    beta = sanitize_sink_b_tito(alpha)
-    return beta
+    return sanitize_sink_b_tito(alpha)
 
 
 def tito_propagation_source_sink_sanitizers_mixed_1(arg):
     alpha = sanitize_a_transform_x_tito(arg)
     beta = sanitize_source_c_tito(alpha)
     gamma = sanitize_sink_d_tito(beta)
-    delta = transform_y_sanitize_b_tito(gamma)
-    return delta
+    return transform_y_sanitize_b_tito(gamma)
 
 
 def tito_propagation_source_sink_sanitizers_mixed_2(arg):
     alpha = sanitize_source_c_tito(arg)
     beta = transform_y_sanitize_b_tito(alpha)
     gamma = sanitize_a_transform_x_tito(beta)
-    delta = sanitize_sink_d_tito(gamma)
-    return delta
+    return sanitize_sink_d_tito(gamma)
 
 
 def sanitize_all(arg):

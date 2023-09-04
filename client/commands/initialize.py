@@ -59,17 +59,11 @@ def _check_configuration_file_location(
     configuration_path: Path, current_directory: Path, global_root: Optional[Path]
 ) -> None:
     if os.path.isfile(configuration_path):
-        if global_root:
-            error = (
-                "Local configurations must be created in subdirectories of "
-                + f"`{str(current_directory)}` as it already contains a "
-                + "`.pyre_configuration`."
-            )
-        else:
-            error = (
-                "A pyre configuration already exists at "
-                + f"`{str(configuration_path)}`."
-            )
+        error = (
+            f"Local configurations must be created in subdirectories of `{str(current_directory)}` as it already contains a `.pyre_configuration`."
+            if global_root
+            else f"A pyre configuration already exists at `{str(configuration_path)}`."
+        )
         raise InitializationException(error)
     local_configuration_path = current_directory / LOCAL_CONFIGURATION_FILE
     if local_configuration_path.is_file():
@@ -83,8 +77,9 @@ def _get_local_configuration(
     current_directory: Path, buck_root: Optional[Path]
 ) -> Dict[str, Any]:
     configuration: Dict[str, Any] = {}
-    using_targets = log.get_yes_no_input("Is your project built with Buck?")
-    if using_targets:
+    if using_targets := log.get_yes_no_input(
+        "Is your project built with Buck?"
+    ):
         targets = log.get_input(
             "Which buck target(s) should pyre analyze?\n"
             + "  Default: Analyze all targets under the configuration (assume fbcode).\n"
@@ -108,9 +103,9 @@ def _get_local_configuration(
             directory.strip() for directory in source_directories.split(",")
         ]
 
-    # TODO(T132432706): Ask for oncall in global configuration, but not in OSS.
-    oncall = log.get_input("What oncall is responsible for this project?\n").strip()
-    if oncall:
+    if oncall := log.get_input(
+        "What oncall is responsible for this project?\n"
+    ).strip():
         configuration["oncall"] = oncall
     return configuration
 

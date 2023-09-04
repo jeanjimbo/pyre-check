@@ -33,16 +33,15 @@ def extract_qualified_name(callable_object: Callable[..., object]) -> Optional[s
         # pyre-fixme[6]: Expected `(...) -> object` for 1st param but got
         #  `_StaticFunctionType`.
         return extract_qualified_name(callable_object.__func__)
-    else:
-        module_name = getattr(callable_object, "__module__", None)
-        # Try and fallback to objclass
-        if module_name is None and (
-            objclass := getattr(callable_object, "__objclass__", None)
-        ):
-            module_name = getattr(objclass, "__module__", None)
-        view_name = getattr(
-            callable_object, "__qualname__", callable_object.__class__.__qualname__
-        )
+    module_name = getattr(callable_object, "__module__", None)
+    # Try and fallback to objclass
+    if module_name is None and (
+        objclass := getattr(callable_object, "__objclass__", None)
+    ):
+        module_name = getattr(objclass, "__module__", None)
+    view_name = getattr(
+        callable_object, "__qualname__", callable_object.__class__.__qualname__
+    )
     if "<locals>" in view_name:
         return None
     return ".".join(filter(None, [module_name, view_name]))
@@ -183,10 +182,7 @@ def _extract_parameter_annotation(
 ) -> Optional[str]:
     annotation = parameter.annotation
     if isinstance(annotation, str):
-        if strip_annotated:
-            return strip_custom_annotations(annotation)
-        else:
-            return annotation
+        return strip_custom_annotations(annotation) if strip_annotated else annotation
     elif isinstance(annotation, type):
         return annotation.__name__
     else:

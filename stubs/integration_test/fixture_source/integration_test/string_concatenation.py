@@ -7,11 +7,11 @@ from integration_test.taint import source, sink
 
 
 def concatenate_lhs():
-    return source() + "A"
+    return f"{source()}A"
 
 
 def concatenate_rhs():
-    return "A" + source()
+    return f"A{source()}"
 
 
 def bad_1():

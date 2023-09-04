@@ -31,10 +31,7 @@ class Configuration:
             with open(path, "r") as configuration_file:
                 json_contents = json.load(configuration_file)
         self._path: Path = path
-        if path.name == ".pyre_configuration.local":
-            self.is_local: bool = True
-        else:
-            self.is_local: bool = False
+        self.is_local: bool = path.name == ".pyre_configuration.local"
         self.root: str = str(path.parent)
         self.original_contents: Dict[str, Any] = json_contents
 
@@ -182,8 +179,7 @@ class Configuration:
         self.strict = True
 
     def add_targets(self, targets: List[str]) -> None:
-        existing_targets = self.targets
-        if existing_targets:
+        if existing_targets := self.targets:
             existing_targets.extend(targets)
         else:
             self.targets = targets
@@ -206,7 +202,7 @@ class Configuration:
                         .strip()
                         .split("\n")
                     )
-                    if not all(target in expanded_targets for target in expanded):
+                    if any(target not in expanded_targets for target in expanded):
                         expanded_targets.update(expanded)
                         deduplicated_targets.append(target)
                 except subprocess.CalledProcessError as error:

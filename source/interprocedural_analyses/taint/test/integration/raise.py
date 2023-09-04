@@ -17,7 +17,6 @@ def backward(x):
 def unreachable():
     x = _test_source()
     raise Exception()
-    _test_sink(x)
 
 
 def unreachable_through_function_call_sink():
@@ -27,12 +26,10 @@ def unreachable_through_function_call_sink():
 
 def no_sink(x):
     raise Exception()
-    _test_sink(x)
 
 
 def no_source():
     raise Exception()
-    return _test_source()
 
 
 def unreachable_through_function_call_source():

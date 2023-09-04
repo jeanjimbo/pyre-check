@@ -18,6 +18,4 @@ class Parameter(NamedTuple):
     kind: Kind
 
     def __eq__(self, other: "Parameter") -> bool:
-        if not isinstance(other, self.__class__):
-            return False
-        return self.name == other.name
+        return self.name == other.name if isinstance(other, self.__class__) else False

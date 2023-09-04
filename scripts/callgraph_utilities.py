@@ -151,8 +151,7 @@ class DynamicCallGraphInputFormat(InputFormat):
             raise ValueError(
                 f"Expected value for individual callee to be a string, got {type(callee)}: {callee}"
             )
-        mapped_qualifier = self.format_qualifier(callee)
-        return mapped_qualifier
+        return self.format_qualifier(callee)
 
 
 class UnionCallGraphFormat(InputFormat):

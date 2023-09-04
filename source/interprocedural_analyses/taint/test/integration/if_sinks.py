@@ -13,4 +13,3 @@ def no_if(x):
 def with_if(x):
     if _test_sink(x):
         pass
-    pass

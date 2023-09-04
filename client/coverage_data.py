@@ -220,7 +220,7 @@ class AnnotationContext:
         Is a parameter implicitly typed? This happens in non-static methods for
         the initial parameter (conventionally `self` or `cls`).
         """
-        return len(self.class_name_stack) > 0 and not self.static_define_depth > 0
+        return len(self.class_name_stack) > 0 and self.static_define_depth <= 0
 
 
 class AnnotationCollector(VisitorWithPositionData):
@@ -295,23 +295,15 @@ class AnnotationCollector(VisitorWithPositionData):
     def visit_Assign(self, node: libcst.Assign) -> None:
         if self.context.assignments_are_function_local():
             return
-        implicitly_annotated_literal = False
-        if isinstance(node.value, libcst.BaseNumber) or isinstance(
-            node.value, libcst.BaseString
-        ):
-            implicitly_annotated_literal = True
-        implicitly_annotated_value = False
-        if isinstance(node.value, libcst.Name) or isinstance(node.value, libcst.Call):
-            # An over-approximation of global values that do not need an explicit
-            # annotation. Erring on the side of reporting these as annotated to
-            # avoid showing false positives to users.
-            implicitly_annotated_value = True
+        implicitly_annotated_literal = isinstance(
+            node.value, (libcst.BaseNumber, libcst.BaseString)
+        )
+        implicitly_annotated_value = isinstance(node.value, (libcst.Name, libcst.Call))
         location = self.location(node)
+        is_annotated = implicitly_annotated_literal or implicitly_annotated_value
         if self.context.assignments_are_class_level():
-            is_annotated = implicitly_annotated_literal or implicitly_annotated_value
             self.attributes.append(AnnotationInfo(node, is_annotated, location))
         else:
-            is_annotated = implicitly_annotated_literal or implicitly_annotated_value
             self.globals.append(AnnotationInfo(node, is_annotated, location))
 
     def visit_AnnAssign(self, node: libcst.AnnAssign) -> None:
@@ -363,16 +355,12 @@ class SuppressionCollector(VisitorWithPositionData):
         match: re.Match[str],
         line: int,
     ) -> Optional[List[int]]:
-        if len(match.groups()) < 1:
-            code_group = None
-        else:
-            code_group = match.group(1)
+        code_group = None if len(match.groups()) < 1 else match.group(1)
         if code_group is None:
             return None
         code_strings = code_group.strip("[] ").split(",")
         try:
-            codes = [int(code) for code in code_strings]
-            return codes
+            return [int(code) for code in code_strings]
         except ValueError:
             LOG.warning("Invalid error suppression code: %s", line)
             return []
@@ -484,7 +472,8 @@ def _is_excluded(
 ) -> bool:
     try:
         return any(
-            [re.match(exclude_pattern, str(path)) for exclude_pattern in excludes]
+            re.match(exclude_pattern, str(path))
+            for exclude_pattern in excludes
         )
     except re.error:
         LOG.warning("Could not parse `excludes`: %s", excludes)

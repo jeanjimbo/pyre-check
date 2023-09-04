@@ -120,15 +120,14 @@ def _run_default_command(
             no_start_server=False,
             no_watchman=False,
         )
-    else:
-        watchman_link = "https://facebook.github.io/watchman/docs/install"
-        LOG.warning(
-            "No watchman binary found. \n"
-            + "To enable pyre incremental, "
-            + f"you can install watchman: {watchman_link}"
-        )
-        LOG.warning("Defaulting to non-incremental check.")
-        return _run_check_command(arguments)
+    watchman_link = "https://facebook.github.io/watchman/docs/install"
+    LOG.warning(
+        "No watchman binary found. \n"
+        + "To enable pyre incremental, "
+        + f"you can install watchman: {watchman_link}"
+    )
+    LOG.warning("Defaulting to non-incremental check.")
+    return _run_check_command(arguments)
 
 
 def _check_open_source_version(
@@ -778,7 +777,7 @@ def infer(
     working_directory = Path.cwd()
     modify_paths = (
         None
-        if len(paths_to_modify) == 0
+        if not paths_to_modify
         else {working_directory / Path(path) for path in paths_to_modify}
     )
     return commands.infer.run(
@@ -1442,7 +1441,7 @@ def coverage(
     configuration = _create_configuration(command_argument, Path("."))
     paths = list(paths)
     paths_deprecated = list(paths_deprecated)
-    paths = paths if len(paths) > 0 else paths_deprecated
+    paths = paths if paths else paths_deprecated
     return commands.coverage.run(
         configuration,
         command_arguments.CoverageArguments(

@@ -18,9 +18,7 @@ def do_and(request: HttpRequest) -> HttpResponse:
     left = bool(request.GET["left"])
     right = bool(request.GET["right"])
 
-    result = eval(f"{left} and {right}")  # noqa: P204
-
-    return result
+    return eval(f"{left} and {right}")
 
 
 def do_or(request: HttpRequest) -> HttpResponse:
@@ -30,6 +28,4 @@ def do_or(request: HttpRequest) -> HttpResponse:
     assert_numeric(left)
     assert_numeric(right)
 
-    result = eval(f"{left} or {right}")  # noqa: P204
-
-    return result
+    return eval(f"{left} or {right}")

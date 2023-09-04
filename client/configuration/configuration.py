@@ -75,7 +75,7 @@ def _get_optional_value(source: Optional[T], default: T) -> T:
 
 def _expand_glob(pattern: str) -> List[str]:
     expanded = glob.glob(pattern)
-    return [pattern] if len(expanded) == 0 else expanded
+    return [pattern] if not expanded else expanded
 
 
 def _expand_all_globs(patterns: Iterable[str]) -> List[str]:
@@ -787,9 +787,7 @@ class Configuration:
 
     def get_site_roots(self) -> Sequence[str]:
         site_roots = self.site_roots
-        if site_roots is not None:
-            return site_roots
-        return get_default_site_roots()
+        return site_roots if site_roots is not None else get_default_site_roots()
 
     def expand_and_get_existent_search_paths(
         self,
@@ -854,13 +852,12 @@ class Configuration:
         python_version = self.python_version
         if python_version is not None:
             return python_version
-        else:
-            version_info = sys.version_info
-            return python_version_module.PythonVersion(
-                major=version_info.major,
-                minor=version_info.minor,
-                micro=version_info.micro,
-            )
+        version_info = sys.version_info
+        return python_version_module.PythonVersion(
+            major=version_info.major,
+            minor=version_info.minor,
+            micro=version_info.micro,
+        )
 
 
 def create_configuration(
@@ -893,13 +890,12 @@ def create_configuration(
     command_argument_configuration = PartialConfiguration.from_command_arguments(
         arguments
     ).expand_relative_paths(str(Path.cwd()))
+    relative_local_root = None
     if found_root is None:
         project_root = Path.cwd()
-        relative_local_root = None
         partial_configuration = command_argument_configuration
     else:
         project_root = found_root.global_root
-        relative_local_root = None
         partial_configuration = PartialConfiguration.from_file(
             project_root / CONFIGURATION_FILE
         ).expand_relative_paths(str(project_root))

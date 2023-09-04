@@ -63,14 +63,12 @@ def sanitize_a_tito(x):
 
 def no_propagation_with_sanitize_a_tito():
     a = a_source()
-    b = sanitize_a_tito(a)
-    return b
+    return sanitize_a_tito(a)
 
 
 def propagation_of_b_with_sanitize_a_tito():
     b = b_source()
-    tito = sanitize_a_tito(b)
-    return tito
+    return sanitize_a_tito(b)
 
 
 def sanitize_a_sink_tito(x):

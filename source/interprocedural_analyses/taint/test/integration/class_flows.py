@@ -82,7 +82,7 @@ def test_classmethod():
 class HasDecoratedClassmethod:
     @classmethod
     @contextmanager
-    def to_sink(self, x):
+    def to_sink(cls, x):
         _test_sink(x)
 
 

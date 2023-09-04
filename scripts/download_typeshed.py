@@ -266,12 +266,7 @@ def write_output_to_directory(
         if data is not None:
             os.makedirs(path.parent, exist_ok=True)
             with path.open("wb") as output_file:
-                if data is not None:
-                    output_file.write(data)
-                elif patch_result.failed:
-                    LOG.warning(f"Failed to apply patch to {patch_result.entry.path}!")
-                else:
-                    pass
+                output_file.write(data)
     # record where we got the typeshed source - otherwise commit messages are the
     # only record!
     with (output_directory_path / "typeshed" / "source_url").open("w") as output_file:
@@ -281,13 +276,18 @@ def write_output_to_directory(
 def _find_entry(typeshed_path: Path, entries: List[FileEntry]) -> Optional[FileEntry]:
     """Finds a particular entry in typeshed, given its path relative to
     `typeshed-master`, possibly while having a different suffix."""
-    for entry in entries:
-        if (
-            entry.path == f"typeshed-master/{typeshed_path.with_suffix('.pyi')}"
-            and entry.data is not None
-        ):
-            return entry
-    return None
+    return next(
+        (
+            entry
+            for entry in entries
+            if (
+                entry.path
+                == f"typeshed-master/{typeshed_path.with_suffix('.pyi')}"
+                and entry.data is not None
+            )
+        ),
+        None,
+    )
 
 
 def main() -> None:

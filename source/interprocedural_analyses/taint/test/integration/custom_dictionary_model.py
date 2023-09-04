@@ -11,28 +11,23 @@ def _test_source_2():
 
 
 def untainted_dictionary():
-    d = {}
-    d["a"] = "I'm not tainted!"
+    d = {"a": "I'm not tainted!"}
     _test_sink(d)
 
 
 def sink_dictionary_value():
-    d = {}
-    d["a"] = _test_source_2()
+    d = {"a": _test_source_2()}
 
 
 def sink_dictionary_key():
-    d = {}
-    d[_test_source_2()] = "b"
+    d = {_test_source_2(): "b"}
 
 
 def tainted_dictionary_value_sink():
-    d = {}
-    d["a"] = _test_source()
+    d = {"a": _test_source()}
     _test_sink(d)
 
 
 def tainted_dictionary_key_sink():
-    d = {}
-    d[_test_source()] = 1
+    d = {_test_source(): 1}
     _test_sink(d)

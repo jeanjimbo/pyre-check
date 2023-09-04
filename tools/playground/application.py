@@ -73,12 +73,11 @@ def _get_cache_contents(file_path: Path) -> str:
 @functools.lru_cache(maxsize=128)
 def _get_cache_file_path(input: str, model: str) -> Path:
     hashable_object = str(input + model).encode("utf-8")
-    sha1_hash_file_name = hashlib.sha1(hashable_object).hexdigest() + ".cache"
+    sha1_hash_file_name = f"{hashlib.sha1(hashable_object).hexdigest()}.cache"
     cache_directory = Path(
         os.environ.get("PYSA_PLAYGROUND_CACHE_DIRECTORY", "/var/pysa_cache")
     )
-    cache_file_path = cache_directory / sha1_hash_file_name
-    return cache_file_path
+    return cache_directory / sha1_hash_file_name
 
 
 class Pyre:

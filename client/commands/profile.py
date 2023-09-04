@@ -63,7 +63,7 @@ class DurationEvent(Event):
             phase_name = tags[PHASE_NAME]
             result[phase_name] = self.duration
             if TRIGGERED_DEPENDENCIES in tags:
-                result[phase_name + ": triggered dependencies"] = int(
+                result[f"{phase_name}: triggered dependencies"] = int(
                     tags[TRIGGERED_DEPENDENCIES]
                 )
 
@@ -163,9 +163,7 @@ class TableStatistics:
                 return float(number[:-1]) * (10**9)
             if number[-1] == "M":
                 return float(number[:-1]) * (10**6)
-            if number[-1] == "K":
-                return float(number[:-1]) * (10**3)
-            return float(number)
+            return float(number[:-1]) * (10**3) if number[-1] == "K" else float(number)
 
         items.sort(key=lambda x: parse(x[1]), reverse=True)
 
@@ -220,7 +218,7 @@ def _collect_memory_statistics_over_time(log_directory: Path) -> StatisticsOverT
     extracted = StatisticsOverTime()
     # lint-ignore: NoUnsafeFilesystemRule
     with open(server_log) as server_log_file:
-        for line in server_log_file.readlines():
+        for line in server_log_file:
             extracted.add(line)
     return extracted
 
@@ -330,7 +328,7 @@ def to_taint(events: Sequence[Event]) -> Dict[str, int]:
         if isinstance(event, DurationEvent)
         and event.metadata.tags.get(PHASE_NAME) == "Static analysis fixpoint"
     ]
-    if len(fixpoint_events) == 0:
+    if not fixpoint_events:
         return result
 
     for name, value in fixpoint_events[-1].metadata.tags.items():
@@ -346,7 +344,7 @@ def print_individual_table_sizes(log_directory: Path) -> None:
     extracted = TableStatistics()
     # lint-ignore: NoUnsafeFilesystemRule
     with open(str(server_log)) as server_log_file:
-        for line in server_log_file.readlines():
+        for line in server_log_file:
             extracted.add(line)
     if extracted.is_empty():
         raise RuntimeError(

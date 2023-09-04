@@ -21,17 +21,14 @@ class Request:
 
 
 def test_via_optional(request: Request):
-    oauth_request = request.optional
-    if oauth_request:
-        access_token = oauth_request.access_token
-        if access_token:
+    if oauth_request := request.optional:
+        if access_token := oauth_request.access_token:
             return access_token.token
     return None
 
 
 def test_via_non_optional(request: Request):
-    access_token = request.non_optional.access_token
-    if access_token:
+    if access_token := request.non_optional.access_token:
         return access_token.token
     return None
 
@@ -76,9 +73,7 @@ class Untainted:
 
 def test_attribute_union_source(t: Union[Token, Untainted]):
     _test_sink(t.token)
-    if isinstance(t, Token):
-        _test_sink(t.token)
-    elif isinstance(t, Untainted):
+    if isinstance(t, (Token, Untainted)):
         _test_sink(t.token)
 
 
@@ -88,9 +83,7 @@ class Sink:
 
 def test_attribute_union_sink(t: Union[Sink, Untainted]):
     t.token = _test_source()
-    if isinstance(t, Sink):
-        t.token = _test_source()
-    elif isinstance(t, Untainted):
+    if isinstance(t, (Sink, Untainted)):
         t.token = _test_source()
 
 

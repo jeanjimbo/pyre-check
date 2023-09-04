@@ -25,7 +25,7 @@ def dictionary_constructor(x: str):
     sink(d[x])  # This is NOT an issue.
 
     d = dict({(source(), 0): 0})
-    for key in d.keys():
+    for key in d:
         sink(key[0])  # This is an issue.
         sink(key[1])  # This is NOT an issue.
 
@@ -41,14 +41,13 @@ def dictionary_constructor(x: str):
 
 
 def dictionary_update():
-    result = {}
     argument = {"source": source()}
-    result.update(argument)
+    result = {} | argument
     sink(result)
 
     result = {"old": {"a": source()}}
     argument = {"new": {"b": source()}}
-    result.update(argument)
+    result |= argument
     sink(result["old"]["a"])  # This is an issue.
     sink(result["old"]["b"])  # This is an issue (false positive).
     sink(result["new"]["a"])  # This is an issue (false positive).
@@ -57,7 +56,7 @@ def dictionary_update():
 
     result = {}
     argument = [("a", {"b": source()})]
-    result.update(argument)
+    result |= argument
     sink(result["a"])  # This is an issue.
     sink(result["a"]["b"])  # This is an issue.
     sink(result["a"]["c"])  # This is an issue (false positive).
@@ -163,15 +162,15 @@ def defaultdict_constructor():
 
 
 def list_constructor(i: int):
-    l = list([0, source()])
+    l = [0, source()]
     sink(l[0])  # This is an issue (false positive).
     sink(l[1])  # This is an issue.
 
-    l = list([{"a": source()}])
+    l = [{"a": source()}]
     sink(l[0]["a"])  # This is an issue.
     sink(l[0]["b"])  # This is NOT an issue.
 
-    l = list([{"a": source(), "c": 0}, {"b": source(), "c": 0}])
+    l = [{"a": source(), "c": 0}, {"b": source(), "c": 0}]
     sink(l[i]["a"])  # This is an issue.
     sink(l[i]["b"])  # This is an issue.
     sink(l[i]["c"])  # This is NOT an issue.
@@ -189,8 +188,7 @@ def list_constructor(i: int):
 
 
 def list_append():
-    l = []
-    l.append(source())
+    l = [source()]
     sink(l[0])
 
     l = []
@@ -200,9 +198,8 @@ def list_append():
 
 
 def list_extend(i: int):
-    l = []
     tainted_list = [source()]
-    l.extend(tainted_list)
+    l = list(tainted_list)
     sink(l[0])
 
     l = []
@@ -223,8 +220,7 @@ def list_extend(i: int):
     sink(l[i][0])  # This is an issue.
     sink(l[i][1])  # This is NOT an issue.
 
-    l = []
-    l.extend({source(): 0})
+    l = list({source(): 0})
     sink(l[i])
 
 
@@ -291,8 +287,7 @@ def list_remove():
 
 
 def set_add():
-    s = {1}
-    s.add(source())
+    s = {1, source()}
     for element in s:
         sink(element)
 
@@ -379,15 +374,15 @@ def deque_extend(i: int):
 
 
 def tuple_constructor(i: int):
-    l = tuple([0, source()])
+    l = 0, source()
     sink(l[0])  # This is an issue (false positive).
     sink(l[1])  # This is an issue.
 
-    l = tuple([{"a": source()}])
+    l = ({"a": source()}, )
     sink(l[0]["a"])  # This is an issue.
     sink(l[0]["b"])  # This is NOT an issue.
 
-    l = tuple([{"a": source(), "c": 0}, {"b": source(), "c": 0}])
+    l = {"a": source(), "c": 0}, {"b": source(), "c": 0}
     sink(l[i]["a"])  # This is an issue.
     sink(l[i]["b"])  # This is an issue.
     sink(l[i]["c"])  # This is NOT an issue.

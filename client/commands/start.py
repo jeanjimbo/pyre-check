@@ -394,7 +394,7 @@ def _run_in_foreground(
     # In foreground mode, we shell out to the backend server and block on it.
     # Server stdout/stderr will be forwarded to the current terminal.
     return_code = 0
-    try:
+    with contextlib.suppress(KeyboardInterrupt):
         LOG.warning("Starting server in the foreground...")
         # lint-ignore: NoUnsafeExecRule
         result = subprocess.run(
@@ -405,15 +405,10 @@ def _run_in_foreground(
             universal_newlines=True,
         )
         return_code = result.returncode
-    except KeyboardInterrupt:
-        # Backend server will exit cleanly when receiving SIGINT.
-        pass
-
     if return_code == 0:
         return commands.ExitCode.SUCCESS
-    else:
-        LOG.error(f"Server exited with non-zero return code: {return_code}")
-        return commands.ExitCode.FAILURE
+    LOG.error(f"Server exited with non-zero return code: {return_code}")
+    return commands.ExitCode.FAILURE
 
 
 @contextlib.contextmanager
@@ -425,10 +420,8 @@ def background_logging(log_file: Path) -> Iterator[None]:
 
 
 def _create_symbolic_link(source: Path, target: Path) -> None:
-    try:
+    with contextlib.suppress(FileNotFoundError):
         source.unlink()
-    except FileNotFoundError:
-        pass
     source.symlink_to(target)
 
 
@@ -533,8 +526,8 @@ def run(
 
     LOG.info(f"Starting server at `{configuration.get_project_identifier()}`...")
     with backend_arguments.temporary_argument_file(
-        server_arguments
-    ) as argument_file_path:
+            server_arguments
+        ) as argument_file_path:
         server_subcommand = (
             "newserver"
             if start_arguments.flavor != identifiers.PyreFlavor.CODE_NAVIGATION
@@ -555,18 +548,17 @@ def run(
         }
         if start_arguments.terminal:
             return _run_in_foreground(server_command, server_environment)
-        else:
-            socket_path = daemon_socket.get_socket_path(
-                configuration.get_project_identifier(),
-                flavor=start_arguments.flavor,
-            )
-            return _run_in_background(
-                server_command,
-                server_environment,
-                log_directory,
-                socket_path,
-                flavor=start_arguments.flavor,
-                event_waiter=server_event.Waiter(
-                    wait_on_initialization=start_arguments.wait_on_initialization
-                ),
-            )
+        socket_path = daemon_socket.get_socket_path(
+            configuration.get_project_identifier(),
+            flavor=start_arguments.flavor,
+        )
+        return _run_in_background(
+            server_command,
+            server_environment,
+            log_directory,
+            socket_path,
+            flavor=start_arguments.flavor,
+            event_waiter=server_event.Waiter(
+                wait_on_initialization=start_arguments.wait_on_initialization
+            ),
+        )

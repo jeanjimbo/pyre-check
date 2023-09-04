@@ -11,8 +11,7 @@ def source():
 
 
 def source_with_inferred():
-    a = source()
-    return a
+    return source()
 
 
 def inferred_is_propagated():
@@ -60,8 +59,7 @@ class HasMethods:
 
 
 def attach_to_returned_sink():
-    x = _test_source()
-    return x
+    return _test_source()
 
 
 def attach_to_returned_source():

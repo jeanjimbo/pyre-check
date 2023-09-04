@@ -63,7 +63,7 @@ class SubdirectoryElement(Element):
         return os.path.join(self.root, self.subdirectory)
 
     def command_line_argument(self) -> str:
-        return self.root + "$" + self.subdirectory
+        return f"{self.root}${self.subdirectory}"
 
 
 @dataclasses.dataclass(frozen=True)
@@ -80,7 +80,7 @@ class SitePackageElement(Element):
         return os.path.join(self.site_root, self.package_path())
 
     def command_line_argument(self) -> str:
-        return self.site_root + "$" + self.package_path()
+        return f"{self.site_root}${self.package_path()}"
 
 
 class RawElement(abc.ABC):
@@ -112,12 +112,10 @@ class SimpleRawElement(RawElement):
         )
 
     def expand_glob(self) -> List[RawElement]:
-        expanded = sorted(glob.glob(self.root))
-        if expanded:
+        if expanded := sorted(glob.glob(self.root)):
             return [SimpleRawElement(path) for path in expanded]
-        else:
-            LOG.warning(f"'{self.root}' does not match any paths.")
-            return []
+        LOG.warning(f"'{self.root}' does not match any paths.")
+        return []
 
     def to_element(self) -> SimpleElement:
         return SimpleElement(self.root)

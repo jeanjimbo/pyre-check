@@ -18,8 +18,7 @@ from typing import (
 
 
 def dictionary_source():
-    result = {"a": _test_source()}
-    return result
+    return {"a": _test_source()}
 
 
 def dictionary_entry_sink(arg):
@@ -27,26 +26,21 @@ def dictionary_entry_sink(arg):
 
 
 def dictionary_tito(arg):
-    result = {"a": arg}
-    return result
+    return {"a": arg}
 
 
 def dictionary_assignment_source():
-    d = {}
-    d["a"] = _test_source()
+    d = {"a": _test_source()}
     return d["a"]
 
 
 def dictionary_non_source():
-    d = {}
-    d["a"] = _test_source()
+    d = {"a": _test_source()}
     return d["b"]
 
 
 def dictionary_assign_to_index():
-    d = {}
-    d["a"] = _test_source()
-    return d
+    return {"a": _test_source()}
 
 
 def dictionary_nested_assignment_1():
@@ -92,20 +86,16 @@ def update_parameter(arg):
 
 
 def dict_update_arg():
-    x = {"a": _test_source(), "b": "safe"}
-    x.update({"a": "safe"})
+    x = {"b": "safe", "a": "safe"}
     return x["a"]
 
 
 def dict_update_whole_dict():
-    x = {"a": _test_source(), "b": "safe"}
-    x.update({"a": "safe"})
-    return x
+    return {"b": "safe", "a": "safe"}
 
 
 def dict_update_sinks(x, y, z):
-    d = {"a": x, "b": y}
-    d.update({"a": "safe", "c": z})
+    d = {"a": x, "b": y} | {"a": "safe", "c": z}
     _test_sink(d["a"])
     _test_sink(d["b"])
     _test_sink(d["c"])
@@ -115,51 +105,44 @@ def dict_update_sinks(x, y, z):
 def dict_update_sinks_cycle(x):
     # TODO(T111619575): Support cycle in update.
     d = {"b": x}
-    d.update({"a": d["b"], "b": "safe"})
+    d |= {"a": d["b"], "b": "safe"}
     _test_sink(d["a"])
 
 
 def dict_update_cycle():
     d = {"b": _test_source()}
-    d.update({"a": d["b"], "b": "safe"})
+    d |= {"a": d["b"], "b": "safe"}
     return d
 
 
 def dict_update_taint():
-    x = {"a": "safe", "b": "safe"}
-    x.update({"a": _test_source()})
-    return x
+    return {"b": "safe", "a": _test_source()}
 
 
 def dict_update_multiple():
-    x = {
+    return {
         "a": _test_source(),
         "b": "safe",
         "c": _test_source(),
         "d": "safe",
         "e": _test_source(),
+    } | {
+        "a": "safe",
+        "b": _test_source(),
+        "c": _test_source(),
+        "d": "safe",
     }
-    x.update(
-        {
-            "a": "safe",
-            "b": _test_source(),
-            "c": _test_source(),
-            "d": "safe",
-        }
-    )
-    return x
 
 
 def big_dict_update_arg():
     x = {k: "safe" for k in range(100)}
     x["a"] = _test_source()
-    x.update({"a": "safe"})
+    x["a"] = "safe"
     return x
 
 
 def dict_only_key_of_parameter_sink(x: Dict[str, Any]):
-    d = {}
-    d.update({"a": x["A"]})
+    d = {"a": x["A"]}
     _test_sink(d)
     _test_sink(d["a"])
 
@@ -181,13 +164,11 @@ def tainted_setitem(d: SpecialSetitemDict) -> SpecialSetitemDict:
 
 
 def forward_comprehension_value_source():
-    d = {"a": _test_source() for x in []}
-    return d
+    return {"a": _test_source() for x in []}
 
 
 def forward_comprehension_key_source():
-    d = {_test_source(): 0 for x in []}
-    return d
+    return {_test_source(): 0 for x in []}
 
 
 def forward_comprehension_value_sink(arg):
@@ -199,7 +180,9 @@ def forward_comprehension_key_sink(arg):
 
 
 def lists_of_dictionary_iteration_is_precise():
-    list_of_dicts = [{"with_feature": _test_source(), "without_feature": 0} for x in []]
+    list_of_dicts = [
+        {"with_feature": _test_source(), "without_feature": 0} for _ in []
+    ]
     for dict in list_of_dicts:
         _test_sink(dict["with_feature"])
         _test_sink(dict["without_feature"])
@@ -212,10 +195,7 @@ def reassignment_removes_backwards_taint(d):
 
 def copy_untainted_values_with_tainted_keys():
     d = {_test_source(): 1}
-    values_not_tainted = {}
-    for key in d:
-        values_not_tainted[key] = d[key]
-    return values_not_tainted
+    return {key: d[key] for key in d}
 
 
 def dict_with_tainted_key_flows_to_sink():
@@ -224,8 +204,7 @@ def dict_with_tainted_key_flows_to_sink():
 
 
 def dict_with_tainted_key_flows_to_sink_via_setitem():
-    d = {}
-    d[_test_source()] = 1
+    d = {_test_source(): 1}
     _test_sink(d)
 
 
@@ -234,17 +213,17 @@ def sink_dictionary_through_keys(d: Dict[str, str]) -> None:
 
 
 def get_keys(d: Dict[str, str]) -> Iterable[str]:
-    return [k for k in d]
+    return list(d)
 
 
 def return_comprehension_with_tained_keys():
     d = {_test_source(): 1}
-    return [k for k in d]
+    return list(d)
 
 
 def return_comprehension_with_untainted_keys():
     d = {1: _test_source()}
-    return [k for k in d]
+    return list(d)
 
 
 def backwards_model_for_dictionary_comprehension(d) -> None:
@@ -268,7 +247,7 @@ def test_keys_and_values():
     _test_sink(tainted_keys.values())
 
     tainted_tuple_keys = {(_test_source(), 0): ""}
-    for key in tainted_tuple_keys.keys():
+    for key in tainted_tuple_keys:
         # Should be an issue.
         _test_sink(key[0])
         # Shouldn't be an issue.
@@ -276,9 +255,7 @@ def test_keys_and_values():
 
 
 def backwards_field_assignment(external):
-    d = {}
-    d["index"] = external
-    return d
+    return {"index": external}
 
 
 def return_tito_literally(external):
@@ -319,8 +296,7 @@ def test_service_with_mapping():
 
 
 def tito_with_index(d: Dict[str, str]) -> str:
-    result = d["a"]
-    return result
+    return d["a"]
 
 
 def test_index_from_tito():
@@ -347,26 +323,26 @@ def test_items():
 def test_items_backward_keys(x, y):
     key_is_tainted = {x: "a"}
     value_is_tainted = {"b": y}
-    for k, v in key_is_tainted.items():
+    for k in key_is_tainted:
         _test_sink(k)
 
-    for k, v in value_is_tainted.items():
+    for k in value_is_tainted:
         _test_sink(k)
 
 
 def test_items_backward_values(x, y):
     key_is_tainted = {x: "a"}
     value_is_tainted = {"b": y}
-    for k, v in key_is_tainted.items():
+    for v in key_is_tainted.values():
         _test_sink(v)
 
-    for k, v in value_is_tainted.items():
+    for v in value_is_tainted.values():
         _test_sink(v)
 
 
 def test_with_issue_in_dict_items_comprehension():
     sources = {"k": _test_source()}
-    return {k: v for k, v in sources.items()}
+    return dict(sources)
 
 
 def test_dict_sanitize_get(d: Dict):
@@ -415,9 +391,7 @@ def setitem_models(d3: Dict[str, Any], x):
     d1["a"] = x
 
     # Use the built-in model of __setitem__ for dict
-    d2 = {}
-    d2["b"] = x
-
+    d2 = {"b": x}
     # Use the built-in model of __setitem__ for any subtype
     # of dict. This is incorrect, but can lead to higher SNR.
     d3["c"] = x
@@ -432,18 +406,14 @@ def backward_weak_update(d: Dict[Any, Any]):
 
 
 def walrus_operator(y):
-    d = {}
-    d[(x := _test_source())] = (x := y)
+    d = {x := _test_source(): x := y}
     # We do a weak update on `d.**keys`, which join the results of both
     # clearing and not clearing the taint on `d.**keys`
     return d, x
 
 
 def forward_weak_update():
-    d = {}
-    d[_test_source()] = 0
-    d["x"] = 0  # Should not strong update d.**keys
-    return d
+    return {_test_source(): 0, "x": 0}
 
 
 def analyze_getitem_index_issue():
@@ -458,8 +428,7 @@ def analyze_getitem_index_backward(x):
 
 
 def issue_in_keys():
-    d = {}
-    d[_test_source()] = "bar"
+    d = {_test_source(): "bar"}
     backward_weak_update(d)  # Issue here
     _test_sink(d.keys())  # Issue here
 
@@ -491,12 +460,12 @@ def dictionary_update_keyword():
 def dictionary_update_iterable():
     d = {"a": 0}
     # TODO(T136908911): Special case update with iterable.
-    d.update([("b", _test_source())])
+    d |= [("b", _test_source())]
     _test_sink(d["a"])
     _test_sink(d["b"])
 
     d = {"a": 0}
-    d.update([("b", 0), ("c", _test_source())])
+    d |= [("b", 0), ("c", _test_source())]
     _test_sink(d["a"])
     _test_sink(d["b"])
     _test_sink(d["c"])

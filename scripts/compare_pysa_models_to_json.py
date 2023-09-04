@@ -321,14 +321,14 @@ def main() -> None:
     diff_json = {
         k: v
         for k, v in json_models.items()
-        if not (k in pysa_models and json_models[k] == pysa_models[k])
+        if k not in pysa_models or json_models[k] != pysa_models[k]
     }
 
     # Models in the .pysa that differ from the .json
     diff_pysa = {
         k: v
         for k, v in pysa_models.items()
-        if not (k in json_models and pysa_models[k] == json_models[k])
+        if k not in json_models or pysa_models[k] != json_models[k]
     }
 
     # Pysa skips analyzing things that inherit from e.g. testing.unittest.UnitTest by
@@ -345,7 +345,7 @@ def main() -> None:
             "{}\nIn JSON: {}\nIn .pysa: {}\n".format(
                 callable_name,
                 json_models[callable_name],
-                pysa_models[callable_name] if callable_name in pysa_models else {},
+                pysa_models.get(callable_name, {}),
             )
             for callable_name in sorted(diff_json.keys())
         ]
@@ -355,7 +355,7 @@ def main() -> None:
             "{}\nIn .pysa: {}\nIn JSON: {}\n".format(
                 callable_name,
                 pysa_models[callable_name],
-                json_models[callable_name] if callable_name in json_models else {},
+                json_models.get(callable_name, {}),
             )
             for callable_name in sorted(diff_pysa_test.keys())
         ]
@@ -365,7 +365,7 @@ def main() -> None:
             "{}\nIn .pysa: {}\nIn JSON: {}\n".format(
                 callable_name,
                 pysa_models[callable_name],
-                json_models[callable_name] if callable_name in json_models else {},
+                json_models.get(callable_name, {}),
             )
             for callable_name in sorted(diff_pysa_non_test.keys())
         ]

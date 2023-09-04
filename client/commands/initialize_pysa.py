@@ -47,11 +47,9 @@ def _setup_environment() -> None:
             " Please use one outside the project directory."
         )
 
-    # Install dependencies
-    install_dependencies = log.get_yes_no_input(
+    if install_dependencies := log.get_yes_no_input(
         "Would you like to install the project dependencies now?"
-    )
-    if install_dependencies:
+    ):
         requirements_file = "requirements.txt"
         if not os.path.isfile(working_directory / requirements_file):
             requirements_file = Path(
@@ -70,8 +68,9 @@ def _setup_environment() -> None:
             "You have chosen not to install dependencies."
             " Please install dependencies before running Pysa to get best results."
         )
-    run_infer = log.get_yes_no_input("Would you like to generate type annotations?")
-    if run_infer:
+    if run_infer := log.get_yes_no_input(
+        "Would you like to generate type annotations?"
+    ):
         subprocess.run(["pyre", "infer", "-i"], check=True)
     pyre_check_path = find_taint_models_directory()
     if pyre_check_path and os.path.isdir(pyre_check_path / "pyre_check"):

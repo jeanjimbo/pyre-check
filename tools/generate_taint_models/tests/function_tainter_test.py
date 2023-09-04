@@ -118,7 +118,7 @@ class FunctionTainterTest(unittest.TestCase):
             "UserControlled",
             "TaintSink[ReturnedToUser]",
         )
-        print(str(list(test_dataclass_parameter_models)[0]))
+        print(list(test_dataclass_parameter_models)[0])
         self.assertEqual(
             str(list(test_dataclass_parameter_models)[0]),
             "def tools.pyre.tools.generate_taint_models.tests.function_tainter_test.test_args_kwargs_without_annotation(*args: TaintSource[UserControlled], **kwargs: TaintSource[UserControlled]) -> TaintSink[ReturnedToUser]: ...",
@@ -133,7 +133,7 @@ class FunctionTainterTest(unittest.TestCase):
             "UserControlled",
             "TaintSink[ReturnedToUser]",
         )
-        print(str(list(test_dataclass_parameter_models)[0]))
+        print(list(test_dataclass_parameter_models)[0])
 
         self.assertEqual(
             str(list(test_dataclass_parameter_models)[0]),

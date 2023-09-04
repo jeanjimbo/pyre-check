@@ -49,10 +49,6 @@ def barB(arg1: str, arg2: int):
 
 
 def a_or_b():
-    if 1 > 2:
-        f = barA
-    else:
-        f = barB
-
+    f = barA if 1 > 2 else barB
     f(_test_source(), 0)
     f(0, _test_source())

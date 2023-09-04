@@ -127,27 +127,15 @@ def b_source():
 
 
 def sanitize_test_a_source():
-    if 1 > 2:
-        x = a_source()
-    else:
-        x = b_source()
-    return x
+    return a_source() if 1 > 2 else b_source()
 
 
 def sanitize_test_b_source():
-    if 1 > 2:
-        x = a_source()
-    else:
-        x = b_source()
-    return x
+    return a_source() if 1 > 2 else b_source()
 
 
 def sanitize_a_and_b_source():
-    if 1 > 2:
-        x = a_source()
-    else:
-        x = b_source()
-    return x
+    return a_source() if 1 > 2 else b_source()
 
 
 def a_sink(x):
@@ -185,14 +173,12 @@ def sanitize_a_source_tito(x):
 
 def no_propagation_with_sanitize_a_source_tito():
     a = a_source()
-    b = sanitize_a_source_tito(a)
-    return b
+    return sanitize_a_source_tito(a)
 
 
 def propagation_of_b_with_sanitize_a_source_tito():
     b = b_source()
-    tito = sanitize_a_source_tito(b)
-    return tito
+    return sanitize_a_source_tito(b)
 
 
 def propagation_of_sanitize_a_source_tito(x):
@@ -244,8 +230,7 @@ def propagation_of_b_sink(x):
 
 def combine_sanitize_a_source_a_sink_tito(x):
     y = sanitize_a_source_tito(x)
-    z = sanitize_a_sink_tito(y)
-    return z
+    return sanitize_a_sink_tito(y)
 
 
 def no_issue_through_combine_sanitize_a_source_a_sink_tito():
@@ -256,8 +241,7 @@ def no_issue_through_combine_sanitize_a_source_a_sink_tito():
 
 def propagation_of_sanitize_a_sink_in_source_trace():
     x = a_source()
-    y = sanitize_a_sink_tito(x)
-    return y
+    return sanitize_a_sink_tito(x)
 
 
 def no_issue_propagation_of_sanitize_a_sink_in_source_trace():
@@ -271,8 +255,7 @@ def sanitize_b_sink_tito(x):
 
 def combine_sanitize_a_sink_b_sink_in_source_trace():
     x = propagation_of_sanitize_a_sink_in_source_trace()
-    y = sanitize_b_sink_tito(x)
-    return y
+    return sanitize_b_sink_tito(x)
 
 
 def sanitize_a_source_tito_with_sink(x):
@@ -325,11 +308,10 @@ def no_issue_fixpoint_sanitize():
 
 
 def partial_issue_sources():
-    if 1 > 2:
-        x = a_source()
-        return sanitize_a_sink_tito(x)
-    else:
+    if 1 <= 2:
         return a_source()
+    x = a_source()
+    return sanitize_a_sink_tito(x)
 
 
 def partial_issue_sinks(x):
@@ -348,10 +330,7 @@ def partial_issue_sanitize():
 
 
 def sanitize_test_a_source_attribute():
-    if 1 > 2:
-        x = a_source()
-    else:
-        x = b_source()
+    x = a_source() if 1 > 2 else b_source()
     c = C_sanitized_a_source(x)
     _test_sink(c.attribute)
 
@@ -377,19 +356,13 @@ def sanitize_test_a_source_attribute_in_tito(x):
 
 
 def sanitize_test_b_source_attribute():
-    if 1 > 2:
-        x = a_source()
-    else:
-        x = b_source()
+    x = a_source() if 1 > 2 else b_source()
     c = C_sanitized_b_source(x)
     _test_sink(c.attribute)
 
 
 def sanitize_test_ab_sources_attribute():
-    if 1 > 2:
-        x = a_source()
-    else:
-        x = b_source()
+    x = a_source() if 1 > 2 else b_source()
     c = C_sanitized_ab_sources(x)
     _test_sink(c.attribute)  # should only trigger Test -> Test
 
@@ -406,28 +379,19 @@ def sanitize_test_all_sources_attribute():
 
 
 def sanitize_test_a_source_instance():
-    if 1 > 2:
-        x = a_source()
-    else:
-        x = b_source()
+    x = a_source() if 1 > 2 else b_source()
     c = C_sanitized_a_source(x)
     _test_sink(c.instance)
 
 
 def sanitize_test_b_source_instance():
-    if 1 > 2:
-        x = a_source()
-    else:
-        x = b_source()
+    x = a_source() if 1 > 2 else b_source()
     c = C_sanitized_b_source(x)
     _test_sink(c.instance)
 
 
 def sanitize_test_ab_sources_instance():
-    if 1 > 2:
-        x = a_source()
-    else:
-        x = b_source()
+    x = a_source() if 1 > 2 else b_source()
     c = C_sanitized_ab_sources(x)
     _test_sink(c.instance)  # should only trigger Test -> Test
 
@@ -611,22 +575,17 @@ def sanitize_parameter_no_rce(x):
 
 
 def sanitize_parameter_no_user_controlled_tito(x, y):
-    if 1 > 2:
-        return x
-    else:
-        return y
+    return x if 1 > 2 else y
 
 
 def no_propagation_with_sanitize_parameter_no_user_controlled_tito():
     a = _user_controlled()
-    b = sanitize_parameter_no_user_controlled_tito(a, 0)
-    return b
+    return sanitize_parameter_no_user_controlled_tito(a, 0)
 
 
 def propagation_of_cookies_with_sanitize_parameter_no_user_controlled_tito():
     b = _cookies()
-    tito = sanitize_parameter_no_user_controlled_tito(b, 0)
-    return tito
+    return sanitize_parameter_no_user_controlled_tito(b, 0)
 
 
 def propagation_of_sanitize_parameter_no_user_controlled_tito(a, b):
@@ -649,10 +608,7 @@ def issue_propagation_of_sanitize_parameter_no_user_controlled_tito_in_sink_trac
 
 
 def sanitize_parameter_no_sql_tito(x, y):
-    if 1 > 2:
-        return x
-    else:
-        return y
+    return x if 1 > 2 else y
 
 
 def no_propagation_with_sanitize_parameter_no_sql_tito(x):
@@ -712,8 +668,7 @@ def propagation_of_sanitize_return_no_sql(x):
 
 def propagation_of_sanitize_return_no_sql_in_source_trace():
     x = _user_controlled()
-    y = propagation_of_sanitize_return_no_sql(x)
-    return y
+    return propagation_of_sanitize_return_no_sql(x)
 
 
 def no_issue_propagation_of_sanitize_return_no_sql_in_source_trace():
@@ -727,19 +682,11 @@ def issue_propagation_of_sanitize_return_no_sql_in_source_trace():
 
 
 def sanitize_return_no_cookies():
-    if 1 > 2:
-        x = _user_controlled()
-    else:
-        x = _cookies()
-    return x
+    return _user_controlled() if 1 > 2 else _cookies()
 
 
 def sanitize_return_no_user_controlled_cookies():
-    if 1 > 2:
-        x = _user_controlled()
-    else:
-        x = _cookies()
-    return x
+    return _user_controlled() if 1 > 2 else _cookies()
 
 
 def sanitize_return_no_rce():
@@ -819,14 +766,12 @@ def sanitize_all_parameters_no_user_controlled_tito(x):
 
 def no_propagation_with_sanitize_all_parameters_no_user_controlled_tito():
     a = _user_controlled()
-    b = sanitize_all_parameters_no_user_controlled_tito(a)
-    return b
+    return sanitize_all_parameters_no_user_controlled_tito(a)
 
 
 def propagation_of_cookies_with_sanitize_all_parameters_no_user_controlled_tito():
     b = _cookies()
-    tito = sanitize_all_parameters_no_user_controlled_tito(b)
-    return tito
+    return sanitize_all_parameters_no_user_controlled_tito(b)
 
 
 def propagation_of_sanitize_user_controlled_tito_in_sink_trace(x):
@@ -850,8 +795,7 @@ def propagation_of_rce_with_sanitize_all_parameters_no_sql_tito(x):
 
 def propagation_of_sanitize_sql_tito_in_source_trace():
     x = _user_controlled()
-    y = sanitize_all_parameters_no_sql_tito(x)
-    return y
+    return sanitize_all_parameters_no_sql_tito(x)
 
 
 def no_issue_propagation_of_sanitize_sql_tito_in_source_trace():
@@ -865,14 +809,12 @@ def sanitize_all_parameters_no_cookies_sql_tito(x):
 
 def no_propagation_of_cookies_with_sanitize_all_parameters_no_cookies_sql_tito():
     a = _cookies()
-    b = sanitize_all_parameters_no_cookies_sql_tito(a)
-    return b
+    return sanitize_all_parameters_no_cookies_sql_tito(a)
 
 
 def propagation_of_user_controlled_with_sanitize_all_parameters_no_cookies_sql_tito():
     b = _user_controlled()
-    tito = sanitize_all_parameters_no_cookies_sql_tito(b)
-    return tito
+    return sanitize_all_parameters_no_cookies_sql_tito(b)
 
 
 def no_propagation_of_sql_with_sanitize_all_parameters_no_cookies_sql_tito(x):
@@ -923,7 +865,4 @@ def sink_taint_sanitize_b_sanitize_a_santize_test(arg):
 
 
 def sanitize_single_argument_tito(x, y):
-    if 1 > 1:
-        return x
-    else:
-        return y
+    return x if 1 > 1 else y

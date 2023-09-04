@@ -132,11 +132,11 @@ class CoveragePaths:
                 argument_paths.append(working_directory / Path(raw_path[1:]))
             else:
                 explicit_paths.append(working_directory / Path(raw_path))
-        if len(explicit_paths) == 0 and len(argument_paths) > 0:
+        if not explicit_paths and argument_paths:
             # Do not typecheck everything in the project if the user passed
             # at least one argument file.
             module_paths: List[Path] = []
-        elif len(explicit_paths) == 0:
+        elif not explicit_paths:
             module_paths = coverage_data.find_module_paths(
                 paths=[
                     configuration.get_local_root() or configuration.get_global_root()
@@ -156,7 +156,7 @@ class CoveragePaths:
     def get_paths_for_backend(self) -> List[str]:
         return [
             *(str(path) for path in self.module_paths),
-            *("@" + str(path) for path in self.argument_paths),
+            *(f"@{str(path)}" for path in self.argument_paths),
         ]
 
 

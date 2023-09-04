@@ -96,11 +96,13 @@ def _rsync_files(
     target_directory: Path,
     arguments: List[str],
 ) -> None:
-    command = ["rsync"]
-    command.extend(arguments)
-    command.extend(["--filter=" + filter_string for filter_string in filters])
-    command.append(str(source_directory))
-    command.append(str(target_directory))
+    command = [
+        "rsync",
+        *arguments,
+        *[f"--filter={filter_string}" for filter_string in filters],
+        str(source_directory),
+        str(target_directory),
+    ]
     subprocess.run(command)
 
 
@@ -252,8 +254,7 @@ def _run_setup_command(
     command: str,
     nightly: bool,
 ) -> None:
-    with open(pyre_directory / "README.md") as f:
-        long_description = f.read()
+    long_description = Path(pyre_directory / "README.md").read_text()
     old_dir = os.getcwd()
     os.chdir(build_root)
     run_setup(
@@ -280,8 +281,8 @@ def _rename_and_move_artifacts(
     wheel = list(dist_directory.glob("**/*.whl"))
     source_distribution = list(dist_directory.glob("**/*.tar.gz"))
     # make sure the appropriate numbers of files are present in the dist folder
-    if not len(wheel) == 1 and not len(source_distribution) == 1:
-        raise ValueError("Unexpected files found in {}/dist.".format(build_root))
+    if len(wheel) != 1 and len(source_distribution) != 1:
+        raise ValueError(f"Unexpected files found in {build_root}/dist.")
     source_distribution, wheel = source_distribution[0], wheel[0]
     destination_path = pyre_directory / "scripts" / "dist"
     source_distribution_name = source_distribution.name
@@ -353,9 +354,7 @@ def build_pypi_package(
             pyre_directory, build_path
         )
         LOG.info("All done.")
-        LOG.info("\n Build artifact available at:\n {}\n".format(wheel_destination))
+        LOG.info(f"\n Build artifact available at:\n {wheel_destination}\n")
         LOG.info(
-            "\n Source distribution available at:\n {}\n".format(
-                distribution_destination
-            )
+            f"\n Source distribution available at:\n {distribution_destination}\n"
         )

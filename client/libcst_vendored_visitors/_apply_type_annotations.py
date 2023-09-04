@@ -330,9 +330,9 @@ class TypeCollector(m.MatcherDecoratableVisitor):
         self,
         node: cst.CSTNode,
     ) -> str:
-        name = None
         names = [q.name for q in self.get_metadata(QualifiedNameProvider, node)]
-        if len(names) == 0:
+        name = None
+        if not names:
             # we hit this branch if the stub is directly using a fully
             # qualified name, which is not technically valid python but is
             # convenient to allow.
@@ -342,8 +342,7 @@ class TypeCollector(m.MatcherDecoratableVisitor):
         if name is None:
             start = self.get_metadata(PositionProvider, node).start
             raise ValueError(
-                "Could not resolve a unique qualified name for type "
-                + f"{get_full_name_for_node(node)} at {start.line}:{start.column}. "
+                f"Could not resolve a unique qualified name for type {get_full_name_for_node(node)} at {start.line}:{start.column}. "
                 + f"Candidate names were: {names!r}"
             )
         return name
@@ -365,10 +364,7 @@ class TypeCollector(m.MatcherDecoratableVisitor):
             relative_prefix += "."
             qualified_name = qualified_name[1:]
         split = qualified_name.rsplit(".", 1)
-        if len(split) == 1:
-            qualifier, target = "", split[0]
-        else:
-            qualifier, target = split
+        qualifier, target = ("", split[0]) if len(split) == 1 else split
         return (relative_prefix + qualifier, target)
 
     def _handle_qualification_and_should_qualify(
@@ -386,13 +382,12 @@ class TypeCollector(m.MatcherDecoratableVisitor):
         elif qualified_name not in self.existing_imports:
             if module in self.existing_imports:
                 return True
-            else:
-                AddImportsVisitor.add_needed_import(
-                    self.context,
-                    module,
-                    target,
-                )
-                return False
+            AddImportsVisitor.add_needed_import(
+                self.context,
+                module,
+                target,
+            )
+            return False
         return False
 
     # Handler functions.
@@ -412,10 +407,7 @@ class TypeCollector(m.MatcherDecoratableVisitor):
         ) = self._get_qualified_name_and_dequalified_node(node)
         should_qualify = self._handle_qualification_and_should_qualify(qualified_name)
         self.annotations.names.add(qualified_name)
-        if should_qualify:
-            return node
-        else:
-            return dequalified_node
+        return node if should_qualify else dequalified_node
 
     def _handle_Index(
         self,
@@ -706,8 +698,8 @@ class ApplyTypeAnnotationsVisitor(ContextAwareTransformer):
         node = annotation.annotation
         if (
             isinstance(node, cst.Name)
-            and (node.value in self.global_names)
-            and not (node.value in self.visited_classes)
+            and node.value in self.global_names
+            and node.value not in self.visited_classes
         ):
             return annotation.with_changes(
                 annotation=cst.SimpleString(value=f'"{node.value}"')
@@ -769,9 +761,7 @@ class ApplyTypeAnnotationsVisitor(ContextAwareTransformer):
                 name = get_full_name_for_node(value)
                 if name is not None and name != "_":
                     self._add_to_toplevel_annotations(name)
-        elif isinstance(only_target, (cst.Subscript)):
-            pass
-        else:
+        elif not isinstance(only_target, (cst.Subscript)):
             name = get_full_name_for_node(only_target)
             if name is not None:
                 self.qualifier.append(name)
@@ -882,7 +872,7 @@ class ApplyTypeAnnotationsVisitor(ContextAwareTransformer):
         self,
         statements: List[Union[cst.SimpleStatementLine, cst.BaseCompoundStatement]],
     ) -> List[Union[cst.SimpleStatementLine, cst.BaseCompoundStatement]]:
-        if len(statements) < 1:
+        if not statements:
             # No statements, nothing to add to
             return statements
         if len(statements[0].leading_lines) == 0:
@@ -926,27 +916,27 @@ class ApplyTypeAnnotationsVisitor(ContextAwareTransformer):
             return p.annotation.deep_equals(q.annotation)  # pyre-ignore[16]
 
         def match_posargs(
-            ps: Sequence[cst.Param],
-            qs: Sequence[cst.Param],
-        ) -> bool:
+                ps: Sequence[cst.Param],
+                qs: Sequence[cst.Param],
+            ) -> bool:
             if len(ps) != len(qs):
                 return False
             for p, q in zip(ps, qs):
-                if self.strict_posargs_matching and not p.name.value == q.name.value:
+                if self.strict_posargs_matching and p.name.value != q.name.value:
                     return False
                 if not compatible(p.annotation, q.annotation):
                     return False
             return True
 
         def match_kwargs(
-            ps: Sequence[cst.Param],
-            qs: Sequence[cst.Param],
-        ) -> bool:
+                ps: Sequence[cst.Param],
+                qs: Sequence[cst.Param],
+            ) -> bool:
             ps_dict = {x.name.value: x for x in ps}
             qs_dict = {x.name.value: x for x in qs}
             if set(ps_dict.keys()) != set(qs_dict.keys()):
                 return False
-            for k in ps_dict.keys():
+            for k in ps_dict:
                 if not compatible(ps_dict[k].annotation, qs_dict[k].annotation):
                     return False
             return True
@@ -996,8 +986,7 @@ class ApplyTypeAnnotationsVisitor(ContextAwareTransformer):
         self.visited_classes.add(original_node.name.value)
         cls_name = ".".join(self.qualifier)
         self.qualifier.pop()
-        definition = self.annotations.class_definitions.get(cls_name)
-        if definition:
+        if definition := self.annotations.class_definitions.get(cls_name):
             b1 = _find_generic_base(definition)
             b2 = _find_generic_base(updated_node)
             if b1 and not b2:
@@ -1073,18 +1062,17 @@ class ApplyTypeAnnotationsVisitor(ContextAwareTransformer):
 
         self.current_assign = None
 
-        if len(original_node.targets) > 1:
-            for assign in original_node.targets:
-                target = assign.target
-                if isinstance(target, (cst.Name, cst.Attribute)):
-                    name = get_full_name_for_node(target)
-                    if name is not None and name != "_":
-                        # Add separate top-level annotations for `a = b = 1`
-                        # as `a: int` and `b: int`.
-                        self._add_to_toplevel_annotations(name)
-            return updated_node
-        else:
+        if len(original_node.targets) <= 1:
             return self._annotate_single_target(original_node, updated_node)
+        for assign in original_node.targets:
+            target = assign.target
+            if isinstance(target, (cst.Name, cst.Attribute)):
+                name = get_full_name_for_node(target)
+                if name is not None and name != "_":
+                    # Add separate top-level annotations for `a = b = 1`
+                    # as `a: int` and `b: int`.
+                    self._add_to_toplevel_annotations(name)
+        return updated_node
 
     def leave_ImportFrom(
         self,
@@ -1132,15 +1120,13 @@ class ApplyTypeAnnotationsVisitor(ContextAwareTransformer):
             )
             toplevel_statements.append(cst.SimpleStatementLine([annotated_assign]))
 
-        # TypeVar definitions could be scattered through the file, so do not
-        # attempt to put new ones with existing ones, just add them at the top.
-        typevars = {
-            k: v for k, v in self.annotations.typevars.items() if k not in self.typevars
-        }
-        if typevars:
-            for var, stmt in typevars.items():
-                toplevel_statements.append(cst.Newline())
-                toplevel_statements.append(stmt)
+        if typevars := {
+            k: v
+            for k, v in self.annotations.typevars.items()
+            if k not in self.typevars
+        }:
+            for stmt in typevars.values():
+                toplevel_statements.extend((cst.Newline(), stmt))
                 self.annotation_counts.typevars_and_generics_added += 1
             toplevel_statements.append(cst.Newline())
 

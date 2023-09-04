@@ -49,8 +49,7 @@ async def read_lsp_request(
 ) -> json_rpc.Request:
     while True:
         try:
-            message = await lsp.read_json_rpc(input_channel)
-            return message
+            return await lsp.read_json_rpc(input_channel)
         except json_rpc.JSONRPCException as json_rpc_error:
             LOG.debug(f"Exception occurred while reading JSON RPC: {json_rpc_error}")
             await lsp.write_json_rpc_ignore_connection_error(
@@ -142,10 +141,9 @@ class PyreLanguageServerApi:
         parameters: Dict[str, object],
         activity_key: Optional[Dict[str, object]],
     ) -> None:
-        should_write_telemetry = (
+        if should_write_telemetry := (
             self.server_state.server_options.language_server_features.telemetry.is_enabled()
-        )
-        if should_write_telemetry:
+        ):
             await lsp.write_json_rpc_ignore_connection_error(
                 self.output_channel,
                 json_rpc.Request(
@@ -174,7 +172,6 @@ class PyreLanguageServerApi:
         ):
             opened_document_state = self.server_state.opened_documents[document_path]
             code_changes = opened_document_state.code
-            current_is_dirty_state = opened_document_state.is_dirty
             if not opened_document_state.pyre_code_updated:
                 result = await self.querier.update_overlay(
                     path=document_path, code=code_changes
@@ -187,6 +184,7 @@ class PyreLanguageServerApi:
                     )
                     LOG.info(result.error_message)
                 else:
+                    current_is_dirty_state = opened_document_state.is_dirty
                     self.server_state.opened_documents[
                         document_path
                     ] = OpenedDocumentState(
@@ -296,10 +294,8 @@ class PyreLanguageServerApi:
             self.server_state.server_options.language_server_features.unsaved_changes.is_enabled()
         )
         error_message = None
-        code_changes = str(
-            "".join(
-                [content_change.text for content_change in parameters.content_changes]
-            )
+        code_changes = "".join(
+            [content_change.text for content_change in parameters.content_changes]
         )
         self.server_state.opened_documents[document_path] = OpenedDocumentState(
             code=code_changes,

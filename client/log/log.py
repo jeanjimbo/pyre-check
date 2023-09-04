@@ -118,7 +118,7 @@ class TimedStreamHandler(logging.StreamHandler):
         return Format.CLEAR_LINE + "".join(
             [
                 Format.CURSOR_UP_LINE + Format.CLEAR_LINE
-                for n in range(self._active_lines - 1)
+                for _ in range(self._active_lines - 1)
             ]
         )
 
@@ -174,8 +174,7 @@ class TimedStreamHandler(logging.StreamHandler):
 
     def _thread(self) -> None:
         while not self._terminate:
-            record = self._record
-            if record:
+            if record := self._record:
                 age = time.time() - self._last_update
                 if age > self.THRESHOLD:
                     self.emit(record, age)
@@ -232,13 +231,11 @@ def enable_file_logging(log_file: Path) -> None:
 
 def cleanup() -> None:
     global __handler
-    handler = __handler
-    if handler:
+    if handler := __handler:
         handler.terminate()
         __handler = None
 
-    output = stdout.getvalue()
-    if output:
+    if output := stdout.getvalue():
         click.echo(output, nl=False)
         if not output.endswith("\n"):
             click.echo()
@@ -312,8 +309,7 @@ class StreamLogger:
 
     def _log_server_stderr_message(self, server_message: str) -> None:
         line = server_message.rstrip()
-        match = self._server_log_pattern.match(line)
-        if match:
+        if match := self._server_log_pattern.match(line):
             section = match.groups()[0]
             message = match.groups()[1]
             self._current_section = section
@@ -339,13 +335,11 @@ class StreamLogger:
             LOG.debug(line)
 
     def _read_stream(self, stream: Iterable[str]) -> None:
-        try:
+        with contextlib.suppress(Exception):
             for line in stream:
                 if self._should_stop_reading_stream:
                     return
                 self._log_server_stderr_message(line)
-        except Exception:
-            pass
 
     def __enter__(self) -> "StreamLogger":
         self._should_stop_reading_stream = False
@@ -368,9 +362,7 @@ def get_yes_no_input(prompt: str) -> bool:
 
 def get_optional_input(prompt: str, default: str) -> str:
     result = get_input(prompt, suffix=f" (Default: `{default}`): ")
-    if result == "":
-        return default
-    return result
+    return default if result == "" else result
 
 
 def get_input(prompt: str, suffix: str = "") -> str:

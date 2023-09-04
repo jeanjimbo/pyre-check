@@ -36,10 +36,7 @@ def tito_via_named(o: Any):
 
 
 def tito_via_min_or_not(o: Any, b: bool):
-    if b:
-        return min(o, "abc")
-    else:
-        return o
+    return min(o, "abc") if b else o
 
 
 def tito_via_constructor(o: Any):
@@ -80,10 +77,7 @@ def issue_from_tuple():
 
 
 def tito_with_tuple(o: Any, b: bool) -> Tuple[bool, bool]:
-    if b:
-        return min(o, "abc"), min(o, "abc")
-    else:
-        return o, o
+    return (min(o, "abc"), min(o, "abc")) if b else (o, o)
 
 
 async def async_tuple_of_bools() -> Tuple[bool, bool]:

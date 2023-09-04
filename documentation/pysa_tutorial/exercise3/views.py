@@ -21,9 +21,7 @@ def get_operator_safe(request: HttpRequest) -> str:
 def operate_on_twos(request: HttpRequest) -> HttpResponse:
     operator = get_operator_safe(request)
 
-    result = eval(f"2 {operator} 2")  # noqa: P204
-
-    return result
+    return eval(f"2 {operator} 2")
 
 
 def operate_on_threes(request: HttpRequest) -> HttpResponse:

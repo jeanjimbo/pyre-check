@@ -25,18 +25,18 @@ class SocketTest(testslide.TestCase):
         project_root = Path("project_root")
         relative_local_root_a = Path("my/project")
         relative_local_root_b = Path("my/otherproject")
-        md5_hash_a = get_md5((str(project_root) + "//" + str(relative_local_root_a)))
+        md5_hash_a = get_md5(f"{str(project_root)}//{str(relative_local_root_a)}")
         md5_hash_a_recomputed = get_md5(
-            (str(project_root) + "//" + str(relative_local_root_a))
+            f"{str(project_root)}//{str(relative_local_root_a)}"
         )
-        md5_hash_b = get_md5((str(project_root) + "//" + str(relative_local_root_b)))
+        md5_hash_b = get_md5(f"{str(project_root)}//{str(relative_local_root_b)}")
         self.assertTrue(md5_hash_a == md5_hash_a_recomputed)
         self.assertFalse(md5_hash_a == md5_hash_b)
 
         # Test socket name length
         project_root = Path("project_root" * 100)
         relative_local_root = Path("my/project")
-        md5_hash = get_md5((str(project_root) + "//" + str(relative_local_root)))
+        md5_hash = get_md5(f"{str(project_root)}//{str(relative_local_root)}")
         self.assertTrue(len(md5_hash) == MD5_LENGTH)
 
     def test_get_project_identifier(self) -> None:
@@ -47,7 +47,7 @@ class SocketTest(testslide.TestCase):
         )
         self.assertEqual(
             get_project_identifier(project_root, relative_local_root="relative"),
-            str(project_root) + "//relative",
+            f"{str(project_root)}//relative",
         )
 
     def _assert_socket_path(

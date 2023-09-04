@@ -121,8 +121,7 @@ class RawCallableModel(Model):
             else:
                 serialized_parameters.append(parameter.name)
 
-        returns = self.annotations.returns
-        if returns:
+        if returns := self.annotations.returns:
             return_annotation = f" -> {returns}"
         else:
             return_annotation = ""
@@ -213,48 +212,39 @@ class FunctionDefinitionModel(RawCallableModel):
     def _get_annotation(
         ast_arg: ast.arg, strip_annotated: bool = True
     ) -> Optional[str]:
-        annotation = ast_arg.annotation
-        # ast tries to parse the annotation (e.g.
-        # Annotated[TestClass, ExampleAnnotation(accesses=(Access.REVIEWED,))]
-        # is treated as an ast.Subscript instead of ast.Name )
-        # We use the unparse function to get the annotation as a string and in the case of custom annotation
-        # use the strip_custom_annotations already defined to extract the actual type annotation
-        if annotation:
-            unparsed_annotation = ast_to_pretty_string(annotation)
-            if strip_annotated:
-                return strip_custom_annotations(unparsed_annotation)
-            else:
-                return unparsed_annotation
-        else:
+        if not (annotation := ast_arg.annotation):
             return None
+        unparsed_annotation = ast_to_pretty_string(annotation)
+        return (
+            strip_custom_annotations(unparsed_annotation)
+            if strip_annotated
+            else unparsed_annotation
+        )
 
     def _generate_parameters(self) -> List[Parameter]:
-        parameters: List[Parameter] = []
         function_arguments = self.definition.args
 
-        for ast_arg in function_arguments.args:
-            parameters.append(
-                Parameter(
-                    ast_arg.arg,
-                    FunctionDefinitionModel._get_annotation(ast_arg),
-                    Parameter.Kind.ARG,
-                )
+        parameters: List[Parameter] = [
+            Parameter(
+                ast_arg.arg,
+                FunctionDefinitionModel._get_annotation(ast_arg),
+                Parameter.Kind.ARG,
             )
-
+            for ast_arg in function_arguments.args
+        ]
         keyword_only_parameters = function_arguments.kwonlyargs
         if len(keyword_only_parameters) > 0:
             parameters.append(
                 Parameter(name="*", annotation=None, kind=Parameter.Kind.ARG)
             )
-            for parameter in keyword_only_parameters:
-                parameters.append(
-                    Parameter(
-                        parameter.arg,
-                        FunctionDefinitionModel._get_annotation(parameter),
-                        Parameter.Kind.ARG,
-                    )
+            parameters.extend(
+                Parameter(
+                    parameter.arg,
+                    FunctionDefinitionModel._get_annotation(parameter),
+                    Parameter.Kind.ARG,
                 )
-
+                for parameter in keyword_only_parameters
+            )
         vararg_parameters = function_arguments.vararg
         if isinstance(vararg_parameters, ast.arg):
             parameters.append(

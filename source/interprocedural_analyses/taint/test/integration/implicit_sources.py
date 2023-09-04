@@ -17,12 +17,12 @@ def bar_format_strings():
 
 def bar_percent_format():
     user_controlled = 1
-    return "%s:123.456.789.123" % (user_controlled,)
+    return f"{user_controlled}:123.456.789.123"
 
 
 def bar_dot_format():
     user_controlled = 1
-    return "{}:123.456.789.123".format(user_controlled)
+    return f"{user_controlled}:123.456.789.123"
 
 
 def does_not_match():
@@ -37,25 +37,17 @@ GOOGLE_API_KEY = "AIzaSyB2qiehH9CMRIuRVJghvnluwA1GvQ3FCe4"
 
 
 def string_source_top_level():
-    params = {"key": GOOGLE_API_KEY}
-    return params
+    return {"key": GOOGLE_API_KEY}
 
 
 def string_source_not_top_level():
-    params = {"key": "AIzaSyB2qiehH9CMRIuRVJghvnluwA1GvQ3FCe4"}
-    return params
+    return {"key": "AIzaSyB2qiehH9CMRIuRVJghvnluwA1GvQ3FCe4"}
 
 
 def string_source_top_level_local_overwrite():
     GOOGLE_API_KEY = "safe"
-    params = {"key": GOOGLE_API_KEY}
-    return params
+    return {"key": GOOGLE_API_KEY}
 
 
 def string_literal_arguments_source(template: str, x):
-    if 1 == 1:
-        return template.format("SELECT1", 1)
-    elif 1 == 1:
-        return template % "SELECT2"
-    else:
-        return x + "SELECT3"
+    return template.format("SELECT1", 1) if True else f"{x}SELECT3"

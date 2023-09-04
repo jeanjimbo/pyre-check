@@ -39,10 +39,7 @@ def _node_to_symbol(
     visitor = _SymbolsCollector()
     visitor.generic_visit(node)
     symbol_info = _generate_lsp_symbol_info(node, node.name, symbol_info)
-    document_symbols_response = _create_document_symbols_response(
-        symbol_info, visitor.symbols
-    )
-    return document_symbols_response
+    return _create_document_symbols_response(symbol_info, visitor.symbols)
 
 
 def _create_document_symbols_response(

@@ -19,16 +19,14 @@ def load_module(module_path: str) -> Optional[ast.Module]:
     try:
         with open(module_path, "r") as file:
             parsed = ast.parse(file.read())
-            if not isinstance(parsed, ast.Module):
-                return None
-            return parsed
+            return None if not isinstance(parsed, ast.Module) else parsed
     except (FileNotFoundError, SyntaxError) as error:
         LOG.warning(f"Could not load `{module_path}`: {str(error)}")
     return None
 
 
 def find_all_paths(root: str) -> Iterator[str]:
-    for path in glob.glob(root + "/**/*.py", recursive=True):
+    for path in glob.glob(f"{root}/**/*.py", recursive=True):
         if os.path.isdir(path):
             continue
 

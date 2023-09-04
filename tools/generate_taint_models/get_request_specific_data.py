@@ -26,9 +26,7 @@ class RequestSpecificDataGenerator(ModelGenerator[CallableModel]):
 
     def gather_functions_to_model(self) -> Iterable[Callable[..., object]]:
         django_urls = self.django_urls
-        if django_urls is None:
-            return []
-        return get_all_views(django_urls)
+        return [] if django_urls is None else get_all_views(django_urls)
 
     def compute_models(
         self, functions_to_model: Iterable[Callable[..., object]]

@@ -26,7 +26,6 @@ def multi_sink(d):
 
 
 def issue():
-    d = {}
-    d["a"] = source_a()
+    d = {"a": source_a()}
     d["b"] = source_b()
     multi_sink(d)

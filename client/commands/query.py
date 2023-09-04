@@ -105,15 +105,13 @@ def run(
     configuration: frontend_configuration.Base,
     query_arguments: command_arguments.QueryArguments,
 ) -> commands.ExitCode:
-    if query_arguments.no_daemon:
-        response = no_daemon_query.execute_query(
-            configuration,
-            query_arguments,
-        )
-        if response is not None:
-            log.stdout.write(json.dumps(response.payload))
-            return commands.ExitCode.SUCCESS
-        else:
-            return commands.ExitCode.FAILURE
-    else:
+    if not query_arguments.no_daemon:
         return run_query(configuration, query_arguments.query)
+    response = no_daemon_query.execute_query(
+        configuration,
+        query_arguments,
+    )
+    if response is None:
+        return commands.ExitCode.FAILURE
+    log.stdout.write(json.dumps(response.payload))
+    return commands.ExitCode.SUCCESS
